@@ -7,7 +7,14 @@ try {
   // nope
 }
 
-/* just for better typings */
+/* just for better typings 
+
+JS already has a typeof operator you can use in an expression context.
+TS adds a typeof operator you can use in a type context to refer to the type
+of a variable or property.
+
+*/
+// these are all functions in the file that are being used in SearchStore
 export default class Worker {
   add: typeof add = add;
   done = done;
@@ -96,6 +103,39 @@ export async function dispose() {
   initEmpty();
 }
 
+// Well this is an important function
+// q which is the key as a string and limit = 0 (used to change the number of results)
+// And we're returning a Promise there's an array of SearchResult that are Meta
+
+// export async function search<Meta = string>(
+//   q: string,
+//   limit = 0,
+// ): Promise<Array<SearchResult<Meta>>> {
+//   // into the function... 
+//   // if the query's trimmed length is 0 return an empty array
+//   if (q.trim().length === 0) {
+//     return [];
+//   }
+//   // this could be printing twice because there's a short wait
+//   console.log("q: "+q);
+//   // otherwise continue with the search. the index variable is a Promise<lunr.Index>
+//   let searchResults = (await index).query(t => {
+    
+//     const exp = expandTerm(q);
+//     console.log("exp "+exp);
+//     t.term(q.toLowerCase(), {});
+//   });
+
+//   if (limit > 0) {
+//     searchResults = searchResults.slice(0, limit);
+//   }
+//   // else if limit == 0 maybe we could implement the previous search function
+
+//   // return the search results, meta is the location of the section or tag with the match
+//   // and each lunr match has a score of how closely they matched the search query for ordering
+//   return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
+// }
+
 export async function search<Meta = string>(
   q: string,
   limit = 0,
@@ -103,7 +143,6 @@ export async function search<Meta = string>(
   if (q.trim().length === 0) {
     return [];
   }
-
   let searchResults = (await index).query(t => {
     q.trim()
       .toLowerCase()
@@ -118,6 +157,8 @@ export async function search<Meta = string>(
   if (limit > 0) {
     searchResults = searchResults.slice(0, limit);
   }
-
   return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
 }
+
+
+

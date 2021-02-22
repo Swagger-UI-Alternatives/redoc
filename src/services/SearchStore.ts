@@ -4,6 +4,10 @@ import { OperationModel } from './models';
 
 import Worker from './SearchWorker.worker';
 
+
+// SearchStore stores the information to be searched
+
+
 function getWorker() {
   let worker: new () => Worker;
   if (IS_BROWSER) {
@@ -23,6 +27,9 @@ export class SearchStore<T> {
   searchWorker = getWorker();
 
   indexItems(groups: Array<IMenuItem | OperationModel>) {
+    // print out some useful stuff
+    console.log("groups");
+    console.log(groups);
     const recurse = items => {
       items.forEach(group => {
         if (group.type !== 'group') {
@@ -46,6 +53,7 @@ export class SearchStore<T> {
   }
 
   search(q: string) {
+    console.log("making a search");
     return this.searchWorker.search<T>(q);
   }
 
