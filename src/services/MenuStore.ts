@@ -17,6 +17,8 @@ export interface IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
+  // Jarod-added J-docTag J-endDocTag ??
+  longDescription?: string;
   depth: number;
   active: boolean;
   expanded: boolean;

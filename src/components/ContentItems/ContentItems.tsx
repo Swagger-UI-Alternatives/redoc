@@ -66,7 +66,9 @@ const middlePanelWrap = component => <MiddlePanel compact={true}>{component}</Mi
 @observer
 export class SectionItem extends React.Component<ContentItemProps> {
   render() {
-    const { name, description, externalDocs, level } = this.props.item as GroupModel;
+    // Jarod-added J-docTag
+    // longDescription added to this list of constant variables being destructured
+    const { name, description, longDescription, externalDocs, level } = this.props.item as GroupModel;
 
     const Header = level === 2 ? H2 : H1;
     return (
@@ -80,6 +82,8 @@ export class SectionItem extends React.Component<ContentItemProps> {
           </MiddlePanel>
         </Row>
         <AdvancedMarkdown source={description || ''} htmlWrap={middlePanelWrap} />
+        {/* Jarod-added J-docTag */}
+        <AdvancedMarkdown source={longDescription || ''} htmlWrap={middlePanelWrap} />
         {externalDocs && (
           <Row>
             <MiddlePanel>

@@ -586,6 +586,7 @@ export function isRedocExtension(key: string): boolean {
     'x-displayName': true,
     'x-examples': true,
     'x-ignoredHeaderParameters': true,
+    // set to false to check if the x-logo gets parsed from input yaml file
     'x-logo': true,
     'x-nullable': true,
     'x-servers': true,
@@ -593,6 +594,8 @@ export function isRedocExtension(key: string): boolean {
     'x-traitTag': true,
     'x-additionalPropertiesName': true,
     'x-explicitMappingOnly': true,
+    // Jarod-added J-docTag
+    'x-ntap-long-description': true,
   };
 
   return key in redocExtensions;

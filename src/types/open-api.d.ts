@@ -40,12 +40,14 @@ export interface OpenAPIPaths {
 export interface OpenAPIRef {
   $ref: string;
 }
-
+// 
 export type Referenced<T> = OpenAPIRef | T;
 
 export interface OpenAPIPath {
   summary?: string;
   description?: string;
+  // Jarod-added J-endDocTag
+  longDescription?: string;
   get?: OpenAPIOperation;
   put?: OpenAPIOperation;
   post?: OpenAPIOperation;
@@ -253,6 +255,8 @@ export interface OpenAPISecurityScheme {
 export interface OpenAPITag {
   name: string;
   description?: string;
+  // Jarod-added J-docTag
+  longDescription?: string;
   externalDocs?: OpenAPIExternalDocumentation;
   'x-displayName'?: string;
 }
