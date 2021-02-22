@@ -7,6 +7,7 @@ import { LinkWrap, LogoImgEl, LogoWrap } from './styled.elements';
 export class ApiLogo extends React.Component<{ info: OpenAPIInfo }> {
   render() {
     const { info } = this.props;
+    // Added the NetApp logo to see how a yaml custom thingy from openapi.ts can be accessed and targeted
     const logoInfo = info['x-logo'];
     if (!logoInfo || !logoInfo.url) {
       return null;

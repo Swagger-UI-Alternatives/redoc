@@ -62,6 +62,8 @@ export default (env: { playground?: boolean; bench?: boolean } = {}, { mode }) =
     path: root('dist'),
     globalObject: 'this',
   },
+  // Jarod-added J-ts-browser-debug-tool
+  devtool: 'source-map',
 
   devServer: {
     contentBase: __dirname,
