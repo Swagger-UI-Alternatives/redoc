@@ -47,7 +47,7 @@ export interface OpenAPIPath {
   summary?: string;
   description?: string;
   // Jarod-added J-endDocTag
-  longDescription?: string;
+  doc?: 'x-ntap-long-description';
   get?: OpenAPIOperation;
   put?: OpenAPIOperation;
   post?: OpenAPIOperation;

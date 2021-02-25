@@ -15,7 +15,7 @@ export class GroupModel implements IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
-  // Jarod-added docTag
+  // Jarod-added J-docTag
   longDescription: string;
   type: MenuItemGroupType;
 

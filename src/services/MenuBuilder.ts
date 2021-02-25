@@ -225,12 +225,19 @@ export class MenuBuilder {
     if (spec['x-webhooks']) {
       getTags(spec['x-webhooks'], true);
     }
-
+    // Jarod J-endDocTag added all the console.logs obvi
     function getTags(paths: OpenAPIPaths, isWebhook?: boolean) {
       for (const pathName of Object.keys(paths)) {
+        console.log("pathName:");
+        console.log(pathName);
         const path = paths[pathName];
+        console.log("path:");
+        console.log(path);
         const operations = Object.keys(path).filter(isOperationName);
         for (const operationName of operations) {
+          // Jarod-added J-endDocTag added some console.log statements to see if doc or anything works
+          console.log("Operation name:");
+          console.log(operationName);
           const operationInfo = path[operationName];
           let operationTags = operationInfo.tags;
 

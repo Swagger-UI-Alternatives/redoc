@@ -49,6 +49,9 @@ export function getStatusCodeType(statusCode: string | number, defaultAsError = 
 }
 
 const operationNames = {
+  // Jarod-added J-endDocTag
+  // but I want this operationName to be <doc> potentially
+  'x-ntap-long-description': true,
   get: true,
   post: true,
   put: true,

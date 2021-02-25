@@ -50,6 +50,9 @@ export class OperationModel implements IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
+  // Jarod-added J-endDocTag added these 2 lines
+  longDescription?: string;
+  // type: 'operation' | 'doc';
   type = 'operation' as const;
 
   parent?: GroupModel;
@@ -86,6 +89,8 @@ export class OperationModel implements IMenuItem {
   ) {
     makeObservable(this);
 
+
+
     this.pointer = operationSpec.pointer;
 
     this.description = operationSpec.description;
@@ -101,6 +106,10 @@ export class OperationModel implements IMenuItem {
     this.isWebhook = !!operationSpec.isWebhook;
 
     this.name = getOperationSummary(operationSpec);
+
+    console.log("httpVerb "+this.httpVerb);
+    // this.type = 'doc';
+
 
     if (this.isCallback) {
       // NOTE: Callbacks by default should not inherit the specification's global `security` definition.
@@ -131,6 +140,7 @@ export class OperationModel implements IMenuItem {
 
     if (options.showExtensions) {
       this.extensions = extractExtensions(operationSpec, options.showExtensions);
+      console.log("extensions "+this.extensions);
     }
   }
 
