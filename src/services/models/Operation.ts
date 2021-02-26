@@ -98,7 +98,14 @@ export class OperationModel implements IMenuItem {
     this.externalDocs = operationSpec.externalDocs;
 
     this.deprecated = !!operationSpec.deprecated;
-    this.httpVerb = operationSpec.httpVerb;
+    
+    // Jarod-added J-endDocTag trying to change the sidebar name to doc instead of overflown long description name
+    if(operationSpec.httpVerb === 'x-ntap-long-description') {
+      this.httpVerb = 'doc';
+    } else {
+      this.httpVerb = operationSpec.httpVerb;
+    }
+    // this.httpVerb = operationSpec.httpVerb;
     this.deprecated = !!operationSpec.deprecated;
     this.operationId = operationSpec.operationId;
     this.path = operationSpec.pathName;
@@ -106,9 +113,8 @@ export class OperationModel implements IMenuItem {
     this.isWebhook = !!operationSpec.isWebhook;
 
     this.name = getOperationSummary(operationSpec);
-
+    // Jarod-added J-endDocTag comment
     console.log("httpVerb "+this.httpVerb);
-    // this.type = 'doc';
 
 
     if (this.isCallback) {
