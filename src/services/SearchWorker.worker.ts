@@ -7,7 +7,7 @@ try {
   // nope
 }
 
-/* just for better typings 
+/* just for better typings
 
 JS already has a typeof operator you can use in an expression context.
 TS adds a typeof operator you can use in a type context to refer to the type
@@ -88,7 +88,8 @@ export async function fromExternalJS(path: string, exportName: string) {
     }
 
     load(self[exportName]);
-  } catch (e) {
+  }
+  catch (e) {
     console.error('Failed to load search index: ' + e.message);
   }
 }

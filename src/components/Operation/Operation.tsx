@@ -17,6 +17,10 @@ import { RequestSamples } from '../RequestSamples/RequestSamples';
 import { ResponsesList } from '../Responses/ResponsesList';
 import { ResponseSamples } from '../ResponseSamples/ResponseSamples';
 import { SecurityRequirements } from '../SecurityRequirement/SecurityRequirement';
+import { shortenHTTPVerb } from '../../utils/openapi';
+
+// J-added J-badge
+import { OperationBadge } from './styled.elements';
 
 const OperationRow = styled(Row)`
   backface-visibility: hidden;
@@ -46,8 +50,12 @@ export class Operation extends React.Component<OperationProps> {
         {(options) => (
           <OperationRow>
             <MiddlePanel>
+              {/* J-badge i think i should add a color coded operationBadge here at the end of H2 */}
               <H2>
                 <ShareLink to={operation.id} />
+                {/* J-badge add OperationBadge here */}
+                {/* <OperationBadge type={operation.httpVerb} /> */}
+                <OperationBadge type={operation.httpVerb}>{shortenHTTPVerb(operation.httpVerb)}</OperationBadge>
                 {summary} {deprecated && <Badge type="warning"> Deprecated </Badge>}
                 {isWebhook && <Badge type="primary"> Webhook </Badge>}
               </H2>

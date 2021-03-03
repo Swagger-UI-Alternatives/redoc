@@ -599,6 +599,8 @@ export function isRedocExtension(key: string): boolean {
     'x-explicitMappingOnly': true,
     // Jarod-added J-docTag
     'x-ntap-long-description': true,
+    // Jarod-added J-intro
+    'x-ntap-introduced': true,
   };
 
   return key in redocExtensions;

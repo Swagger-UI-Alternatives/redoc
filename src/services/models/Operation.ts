@@ -53,6 +53,9 @@ export class OperationModel implements IMenuItem {
   // Jarod-added J-endDocTag added these 2 lines
   longDescription?: string;
   // type: 'operation' | 'doc';
+  // Jarod-added J-intro? idk how the region affects anything
+  introduced?: string;
+
   type = 'operation' as const;
 
   parent?: GroupModel;
@@ -79,6 +82,7 @@ export class OperationModel implements IMenuItem {
   extensions: Record<string, any>;
   isCallback: boolean;
   isWebhook: boolean;
+
 
   constructor(
     private parser: OpenAPIParser,
@@ -112,10 +116,18 @@ export class OperationModel implements IMenuItem {
     this.isCallback = isCallback;
     this.isWebhook = !!operationSpec.isWebhook;
 
+    // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to the first 50ish chars of the endpoint's description
     this.name = getOperationSummary(operationSpec);
     // Jarod-added J-endDocTag comment
     console.log("httpVerb "+this.httpVerb);
+    console.log("operationId "+this.operationId);
+    // should the name be the path? idk yet
+    this.name = this.path;
+    console.log("name "+this.name);
 
+    // Jarod-added J-intro
+    this.introduced = operationSpec["x-ntap-introduced"];
+    
 
     if (this.isCallback) {
       // NOTE: Callbacks by default should not inherit the specification's global `security` definition.
