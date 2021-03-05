@@ -6,8 +6,6 @@ import Worker from './SearchWorker.worker';
 
 
 // SearchStore stores the information to be searched
-
-
 function getWorker() {
   let worker: new () => Worker;
   if (IS_BROWSER) {

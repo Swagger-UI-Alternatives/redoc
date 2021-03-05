@@ -82,6 +82,7 @@ export interface OpenAPIOperation {
   'x-codeSamples'?: OpenAPIXCodeSample[];
   'x-code-samples'?: OpenAPIXCodeSample[]; // deprecated
   // Jarod-added J-intro
+  introduced?: string;
   'x-ntap-introduced'?: string;
 }
 
