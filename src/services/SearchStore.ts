@@ -33,7 +33,7 @@ export class SearchStore<T> {
     const recurse = items => {
       items.forEach(group => {
         if (group.type !== 'group') {
-          this.add(group.name, group.description || '', group.id);
+          this.add(group.name, group.description, group.longDescription || '', group.id); //anthony added longdescription
         }
         recurse(group.items);
       });
@@ -43,8 +43,8 @@ export class SearchStore<T> {
     this.searchWorker.done();
   }
 
-  add(title: string, body: string, meta?: T) {
-    this.searchWorker.add(title, body, meta);
+  add(title: string, body: string, longDescription: string, meta?: T) { //anthony added longdescription
+    this.searchWorker.add(title, body, longDescription, meta);
   }
 
   dispose() {
