@@ -1,0 +1,18 @@
+/* Added by Madison to attempt to style css */
+/* This file should contain any custom styling used to override the default Redoc styling */
+
+h1 {
+    color: #0052cc !important;
+}
+
+a {
+    color: #0052cc !important;
+}
+
+.active span{
+    color: #0052cc !important;
+}
+
+label:hover{
+    color: #0052cc !important;
+}
