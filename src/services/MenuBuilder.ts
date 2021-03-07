@@ -225,14 +225,32 @@ export class MenuBuilder {
     if (spec['x-webhooks']) {
       getTags(spec['x-webhooks'], true);
     }
-
+    // Jarod J-endDocTag added all the console.logs obvi
     function getTags(paths: OpenAPIPaths, isWebhook?: boolean) {
       for (const pathName of Object.keys(paths)) {
+        console.log("pathName:");
+        console.log(pathName);
         const path = paths[pathName];
+        console.log("path:");
+        console.log(path);
         const operations = Object.keys(path).filter(isOperationName);
         for (const operationName of operations) {
+          // Jarod-added J-endDocTag added some console.log statements to see if doc or anything works
+          console.log("Operation name:");
+          console.log(operationName);
           const operationInfo = path[operationName];
           let operationTags = operationInfo.tags;
+          // Jarod-added J-intro this is to check if x-ntap-introduced is being received. it is
+          // try to add the introduced string to the operation
+          console.log("operationInfo:");
+          console.log(operationInfo);
+
+
+
+
+
+
+
 
           if (!operationTags || !operationTags.length) {
             // empty tag
@@ -259,6 +277,8 @@ export class MenuBuilder {
               pathParameters: path.parameters || [],
               pathServers: path.servers,
               isWebhook: !!isWebhook,
+              // Jarod-added J-intro
+              introduced: operationInfo['x-ntap-introduced'],
             });
           }
         }

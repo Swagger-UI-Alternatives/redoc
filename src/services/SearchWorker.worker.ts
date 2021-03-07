@@ -7,7 +7,7 @@ try {
   // nope
 }
 
-/* just for better typings 
+/* just for better typings
 
 JS already has a typeof operator you can use in an expression context.
 TS adds a typeof operator you can use in a type context to refer to the type
@@ -28,6 +28,7 @@ export default class Worker {
 export interface SearchDocument {
   title: string;
   description: string;
+  longDescription: string; //anthony added longdescription
   id: string;
 }
 
@@ -50,6 +51,7 @@ function initEmpty() {
   builder = new lunr.Builder();
   builder.field('title');
   builder.field('description');
+  builder.field('longDescription'); //anthony added longdescription
   builder.ref('ref');
 
   builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
@@ -61,11 +63,12 @@ function initEmpty() {
 
 initEmpty();
 
-const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
+const expandTerm = term => '' + lunr.stemmer(new lunr.Token(term, {})) + ''; //anthony removed '*'
 
-export function add<T>(title: string, description: string, meta?: T) {
+export function add<T>(title: string, description: string, longDescription: string,  meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), ref };
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; //anthony added longdescription
+  //console.log(item); //anthony
   builder.add(item);
 }
 
@@ -88,7 +91,8 @@ export async function fromExternalJS(path: string, exportName: string) {
     }
 
     load(self[exportName]);
-  } catch (e) {
+  }
+  catch (e) {
     console.error('Failed to load search index: ' + e.message);
   }
 }
@@ -102,39 +106,6 @@ export async function dispose() {
   store = [];
   initEmpty();
 }
-
-// Well this is an important function
-// q which is the key as a string and limit = 0 (used to change the number of results)
-// And we're returning a Promise there's an array of SearchResult that are Meta
-
-// export async function search<Meta = string>(
-//   q: string,
-//   limit = 0,
-// ): Promise<Array<SearchResult<Meta>>> {
-//   // into the function... 
-//   // if the query's trimmed length is 0 return an empty array
-//   if (q.trim().length === 0) {
-//     return [];
-//   }
-//   // this could be printing twice because there's a short wait
-//   console.log("q: "+q);
-//   // otherwise continue with the search. the index variable is a Promise<lunr.Index>
-//   let searchResults = (await index).query(t => {
-    
-//     const exp = expandTerm(q);
-//     console.log("exp "+exp);
-//     t.term(q.toLowerCase(), {});
-//   });
-
-//   if (limit > 0) {
-//     searchResults = searchResults.slice(0, limit);
-//   }
-//   // else if limit == 0 maybe we could implement the previous search function
-
-//   // return the search results, meta is the location of the section or tag with the match
-//   // and each lunr match has a score of how closely they matched the search query for ordering
-//   return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
-// }
 
 export async function search<Meta = string>(
   q: string,
@@ -157,8 +128,8 @@ export async function search<Meta = string>(
   if (limit > 0) {
     searchResults = searchResults.slice(0, limit);
   }
+  //console.log(searchResults); //anthony
   return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
 }
-
 
 

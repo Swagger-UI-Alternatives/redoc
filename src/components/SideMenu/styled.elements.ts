@@ -4,6 +4,7 @@ import { darken } from 'polished';
 import { deprecatedCss, ShelfIcon } from '../../common-elements';
 import styled, { css, ResolvedThemeInterface } from '../../styled-components';
 
+// J-endDocTag J-badge gonna use this
 export const OperationBadge = styled.span.attrs((props: { type: string }) => ({
   className: `operation-type ${props.type}`,
 }))<{ type: string }>`
@@ -164,6 +165,13 @@ export const MenuItemTitle = styled.span<{ width?: string }>`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
+
+// Jarod-added J-intro
+// export const IntroducedIn = styled.p<{ type?: string }>`
+//   text-align: left;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// `;
 
 export const RedocAttribution = styled.div`
   ${({ theme }) => `

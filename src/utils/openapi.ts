@@ -49,6 +49,9 @@ export function getStatusCodeType(statusCode: string | number, defaultAsError = 
 }
 
 const operationNames = {
+  // Jarod-added J-endDocTag
+  // but I want this operationName to be <doc> potentially
+  'x-ntap-long-description': true,
   get: true,
   post: true,
   put: true,
@@ -596,6 +599,8 @@ export function isRedocExtension(key: string): boolean {
     'x-explicitMappingOnly': true,
     // Jarod-added J-docTag
     'x-ntap-long-description': true,
+    // Jarod-added J-intro
+    'x-ntap-introduced': true,
   };
 
   return key in redocExtensions;
