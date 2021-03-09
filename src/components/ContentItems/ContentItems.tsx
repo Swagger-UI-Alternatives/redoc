@@ -14,10 +14,13 @@ export class ContentItems extends React.Component<{
 }> {
   render() {
     const items = this.props.items;
+    //console.log("items");
+    //console.log(items);
     if (items.length === 0) {
       return null;
     }
     return items.map(item => {
+      //console.log(<ContentItem key={item.id} item={item} />);
       return <ContentItem key={item.id} item={item} />;
     });
   }
@@ -33,6 +36,8 @@ export class ContentItem extends React.Component<ContentItemProps> {
     const item = this.props.item;
     let content;
     const { type } = item;
+    /*console.log("type");
+   /console.log(type);*/
     switch (type) {
       case 'group':
         content = null;
@@ -68,7 +73,7 @@ export class SectionItem extends React.Component<ContentItemProps> {
   render() {
     // Jarod-added J-docTag
     // longDescription added to this list of constant variables being destructured
-    const { name, description, longDescription, externalDocs, level } = this.props.item as GroupModel;
+    const { name, description, longDescription, externalDocs, level } = this.props.item as GroupModel; //takes this information from Group.model
 
     const Header = level === 2 ? H2 : H1;
     return (
