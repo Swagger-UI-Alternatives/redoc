@@ -81,6 +81,8 @@ export interface OpenAPIOperation {
   servers?: OpenAPIServer[];
   'x-codeSamples'?: OpenAPIXCodeSample[];
   'x-code-samples'?: OpenAPIXCodeSample[]; // deprecated
+  // Jarod-added J-intro
+  'x-ntap-introduced'?: string;
 }
 
 export interface OpenAPIParameter {
@@ -127,7 +129,6 @@ export interface OpenAPISchema {
   anyOf?: OpenAPISchema[];
   allOf?: OpenAPISchema[];
   not?: OpenAPISchema;
-
   title?: string;
   multipleOf?: number;
   maximum?: number;

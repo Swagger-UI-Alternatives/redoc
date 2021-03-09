@@ -53,6 +53,9 @@ export class OperationModel implements IMenuItem {
   // Jarod-added J-endDocTag added these 2 lines
   longDescription?: string;
   // type: 'operation' | 'doc';
+  // Jarod-added J-intro? idk how the region affects anything
+  introduced?: string;
+
   type = 'operation' as const;
 
   parent?: GroupModel;
@@ -80,6 +83,7 @@ export class OperationModel implements IMenuItem {
   isCallback: boolean;
   isWebhook: boolean;
 
+
   constructor(
     private parser: OpenAPIParser,
     private operationSpec: ExtendedOpenAPIOperation,
@@ -98,18 +102,32 @@ export class OperationModel implements IMenuItem {
     this.externalDocs = operationSpec.externalDocs;
 
     this.deprecated = !!operationSpec.deprecated;
-    this.httpVerb = operationSpec.httpVerb;
+    
+    // Jarod-added J-endDocTag trying to change the sidebar name to doc instead of overflown long description name
+    if(operationSpec.httpVerb === 'x-ntap-long-description') {
+      this.httpVerb = 'doc';
+    } else {
+      this.httpVerb = operationSpec.httpVerb;
+    }
+    // this.httpVerb = operationSpec.httpVerb;
     this.deprecated = !!operationSpec.deprecated;
     this.operationId = operationSpec.operationId;
     this.path = operationSpec.pathName;
     this.isCallback = isCallback;
     this.isWebhook = !!operationSpec.isWebhook;
 
+    // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to the first 50ish chars of the endpoint's description
     this.name = getOperationSummary(operationSpec);
-
+    // Jarod-added J-endDocTag comment
     console.log("httpVerb "+this.httpVerb);
-    // this.type = 'doc';
+    console.log("operationId "+this.operationId);
+    // should the name be the path? idk yet
+    this.name = this.path;
+    console.log("name "+this.name);
 
+    // Jarod-added J-intro
+    this.introduced = operationSpec["x-ntap-introduced"];
+    
 
     if (this.isCallback) {
       // NOTE: Callbacks by default should not inherit the specification's global `security` definition.

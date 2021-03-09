@@ -21,6 +21,8 @@ export interface IMenuItem {
   description?: string;
   // Jarod-added J-docTag J-endDocTag ??
   longDescription?: string;
+  // Jarod-added J-intro
+  introduced?: string;
   depth: number;
   active: boolean;
   expanded: boolean;

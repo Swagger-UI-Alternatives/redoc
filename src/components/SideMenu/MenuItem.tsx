@@ -6,7 +6,10 @@ import { ShelfIcon } from '../../common-elements/shelfs';
 import { IMenuItem, OperationModel } from '../../services';
 import { shortenHTTPVerb } from '../../utils/openapi';
 import { MenuItems } from './MenuItems';
+// Jarod-added J-intro
+// import { IntroducedIn, MenuItemLabel, MenuItemLi, MenuItemTitle, OperationBadge } from './styled.elements';
 import { MenuItemLabel, MenuItemLi, MenuItemTitle, OperationBadge } from './styled.elements';
+
 import { l } from '../../services/Labels';
 
 export interface MenuItemProps {
@@ -81,9 +84,10 @@ export class OperationMenuItemContent extends React.Component<OperationMenuItemC
       this.ref.current.scrollIntoViewIfNeeded();
     }
   }
-
+  // J-endDocTag J-badge this is how the OperationBadge gets sent from the local styled.elements.ts file to MenuItem to be rendered in the side menu
   render() {
     const { item } = this.props;
+
     return (
       <MenuItemLabel
         depth={item.depth}
@@ -100,6 +104,9 @@ export class OperationMenuItemContent extends React.Component<OperationMenuItemC
           {item.name}
           {this.props.children}
         </MenuItemTitle>
+        {/* Jarod-added J-intro */}
+        {/* <IntroducedIn type={item.introduced}>{item.introduced}</IntroducedIn> */}
+        {item.introduced}
       </MenuItemLabel>
     );
   }
