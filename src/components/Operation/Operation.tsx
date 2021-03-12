@@ -50,11 +50,10 @@ export class Operation extends React.Component<OperationProps> {
         {(options) => (
           <OperationRow>
             <MiddlePanel>
-              {/* J-badge i think i should add a color coded operationBadge here at the end of H2 */}
+              {/* J-badge i think i should add a color coded operationBadge here in H2 */}
               <H2>
                 <ShareLink to={operation.id} />
-                {/* J-badge add OperationBadge here */}
-                {/* <OperationBadge type={operation.httpVerb} /> */}
+                {/* J-badge add OperationBadge here. Also have to center these 3 things */}
                 <OperationBadge type={operation.httpVerb}>{shortenHTTPVerb(operation.httpVerb)}</OperationBadge>
                 {summary} {deprecated && <Badge type="warning"> Deprecated </Badge>}
                 {isWebhook && <Badge type="primary"> Webhook </Badge>}
@@ -75,7 +74,8 @@ export class Operation extends React.Component<OperationProps> {
               <CallbacksList callbacks={operation.callbacks} />
             </MiddlePanel>
             <DarkRightPanel>
-              {!options.pathInMiddlePanel && !isWebhook && <Endpoint operation={operation} />}
+              {/* Jarod-added J-endDocTag right panel doc removal */}
+              {!options.pathInMiddlePanel && !isWebhook && operation.httpVerb !== 'doc' && <Endpoint operation={operation} />}
               <RequestSamples operation={operation} />
               <ResponseSamples operation={operation} />
               <CallbackSamples callbacks={operation.callbacks} />

@@ -130,6 +130,7 @@ export interface OpenAPISchema {
   anyOf?: OpenAPISchema[];
   allOf?: OpenAPISchema[];
   not?: OpenAPISchema;
+  
   title?: string;
   multipleOf?: number;
   maximum?: number;
