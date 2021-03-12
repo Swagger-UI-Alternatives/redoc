@@ -34,18 +34,30 @@ export class MarkerService {
   }
 
   mark(term?: string) {
+    //Sophie-- this might be where word is highlighted? - yes
+    //console.log("term");
+    //console.log(term);
     if (!term && !this.prevTerm) {
       return;
     }
     this.map.forEach(val => {
       val.unmark();
+      //console.log("val");
+      //console.log(val);
       val.mark(term || this.prevTerm);
+      //what is coming from this?
+     // console.log("val.mark(term || this.prevTerm)");
+     // console.log(val.mark(term || this.prevTerm));
     });
-    this.prevTerm = term || this.prevTerm;
+    this.prevTerm = term || this.prevTerm; 
+    console.log(this.prevTerm = term || this.prevTerm);
   }
 
   unmark() {
     this.map.forEach(val => val.unmark());
+    //called when type first two characters of search
+    //console.log("unmark");
+   
     this.prevTerm = '';
   }
 }

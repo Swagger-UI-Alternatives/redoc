@@ -70,6 +70,9 @@ export function mapLang(lang: string): string {
  */
 export function highlight(source: string | number | boolean, lang: string = DEFAULT_LANG): string {
   lang = lang.toLowerCase();
+  //Sophie- only prints this message at beginning of loading page
+  //console.log("if this is printing, you are in highlight function");
+  //console.log(lang);
   let grammar = Prism.languages[lang];
   if (!grammar) {
     grammar = Prism.languages[mapLang(lang)];

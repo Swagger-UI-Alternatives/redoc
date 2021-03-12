@@ -1777,6 +1777,83 @@ tags:
       Kerberos is a protocol designed to provide strong authentication for users and hosts within a client/server environment. The basis of the protocol is a shared, secret-key cryptology system. (Kerberos uses shared-key encryption to ensure the confidentiality of the data. It also uses hashing techniques to ensure the integrity of the data (so that no one can modify the data unless allowed to do so). With the NetApp multiprotocol storage platform, through which clients based on UNIX or Windows can access data using CIFS or NFS, it is crucial to provide the ability to use standard network services for authentication and for identity storage.<br/>
 
       To configure an ONTAP system to use Kerberos for NFS, Kerberos must be enabled on a data LIF in the SVM that owns the NFS server. A Kerberos realm needs to be created before enabling Kerberos on a data LIF. (The Kerberos realm is needed so that the cluster knows how to format Kerberos ticket requests.) The Kerberos APIs allow you to define, create, modify, and delete realms for the SVM. The APIs also allow you to enable/disable Kerberos on a data LIF and update the Kerberos interface configuration for a particular data LIF in the SVM.
+  
+  - name: models
+    x-displayName: Models
+    description: |
+      ## volume
+      <SchemaDefinition schemaRef="#/components/schemas/volume" />
+
+      ## volume_reference
+      <SchemaDefinition schemaRef="#/components/schemas/volume_reference" />
+
+      ## volume_response
+      <SchemaDefinition schemaRef="#/components/schemas/volume_response" />
+
+      ## volume_metrics
+      <SchemaDefinition schemaRef="#/components/schemas/volume_metrics" />
+
+      ## volume_statistics_referece
+      <SchemaDefinition schemaRef="#/components/schemas/volume_statistics_reference" />
+
+      ## error
+      <SchemaDefinition schemaRef="#/components/schemas/error" />
+
+      ## error_arguments
+      <SchemaDefinition schemaRef="#/components/schemas/error_arguments" />
+
+      ## error_response
+      <SchemaDefinition schemaRef="#/components/schemas/error_response" />
+
+      ## error_responses
+      <SchemaDefinition schemaRef="#/components/schemas/error_responses" />
+
+      ## job_link_response
+      <SchemaDefinition schemaRef="#/components/schemas/job_link_response" />
+
+      ## href
+      <SchemaDefinition schemaRef="#/components/schemas/href" />
+
+      ## self_link
+      <SchemaDefinition schemaRef="#/components/schemas/self_link" />
+
+      ## related_link
+      <SchemaDefinition schemaRef="#/components/schemas/related_link" />
+
+      ## collection_links
+      <SchemaDefinition schemaRef="#/components/schemas/collection_links" />
+
+      ## performance_metric_io_type_reference
+      <SchemaDefinition schemaRef="#/components/schemas/performance_metric_io_type_reference" />
+
+      ## snapshot_policy_reference
+      <SchemaDefinition schemaRef="#/components/schemas/snapshot_policy_reference" />
+
+      ## qos_policy_reference
+      <SchemaDefinition schemaRef="#/components/schemas/qos_policy_reference" />
+
+      ## export_policy_reference
+      <SchemaDefinition schemaRef="#/components/schemas/export_policy_reference" />
+
+      ## sum_reference
+      <SchemaDefinition schemaRef="#/components/schemas/svm_reference" />
+
+      ## snapshot_reference
+      <SchemaDefinition schemaRef="#/components/schemas/snapshot_reference" />
+
+      ## aggregate_reference
+      <SchemaDefinition schemaRef="#/components/schemas/aggregate_reference" />
+
+      ## volume_metrics_response
+      <SchemaDefinition schemaRef="#/components/schemas/volume_metrics_response" />
+
+      ## perfomance_metric
+      <SchemaDefinition schemaRef="#/components/schemas/performance_metric" />
+
+      ## job_link
+      <SchemaDefinition schemaRef="#/components/schemas/job_link" />
+
+    
 
 paths:
   /storage/volumes:

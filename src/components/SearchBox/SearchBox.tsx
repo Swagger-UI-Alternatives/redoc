@@ -120,7 +120,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     this.setState({
       results,
     });
-    this.props.marker.mark(term);
+    this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight 
   }
 
   @bind
