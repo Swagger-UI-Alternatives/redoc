@@ -240,7 +240,7 @@ export class MenuBuilder {
           console.log(operationName);
           const operationInfo = path[operationName];
           let operationTags = operationInfo.tags;
-          // Jarod-added J-intro this is to check if x-ntap-introduced is being received. it is
+          // Jarod-added J-intro this is to check if x-ntap-introduced is being received. it is.
           // try to add the introduced string to the operation
           console.log("operationInfo:");
           console.log(operationInfo);

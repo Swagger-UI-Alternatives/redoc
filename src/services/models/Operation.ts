@@ -116,14 +116,15 @@ export class OperationModel implements IMenuItem {
     this.isCallback = isCallback;
     this.isWebhook = !!operationSpec.isWebhook;
 
-    // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to the first 50ish chars of the endpoint's description
+    // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to
+    // the summary, then the operationId, then the first 50ish chars of the endpoint's description
     this.name = getOperationSummary(operationSpec);
     // Jarod-added J-endDocTag comment
     console.log("httpVerb "+this.httpVerb);
     console.log("operationId "+this.operationId);
     // should the name be the path? idk yet
     this.name = this.path;
-    console.log("name "+this.name);
+    console.log("name: should come after "+this.name);
 
     // Jarod-added J-intro
     this.introduced = operationSpec["x-ntap-introduced"];

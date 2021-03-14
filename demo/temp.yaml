@@ -2502,65 +2502,65 @@ paths:
       tags: [ storage ]
       x-ntap-introduced: v1.0
       x-ntap-deprecated: v1.2
-      # description: |
-      #   Retrieves volumes.
+      description: |
+        Retrieves volumes.
   
-      #   ### Expensive properties
-      #   There is an added cost to retrieving values for these properties. They are not included by default in GET results and must be explicitly requested using the `fields` query parameter. See [`Requesting specific fields`](#Requesting_specific_fields) to learn more.
-      #   * `is_svm_root`
-      #   * `analytics.*`
-      #   * `application.*`
-      #   * `encryption.*`
-      #   * `clone.parent_snapshot.name`
-      #   * `clone.parent_snapshot.uuid`
-      #   * `clone.parent_svm.name`
-      #   * `clone.parent_svm.uuid`
-      #   * `clone.parent_volume.name`
-      #   * `clone.parent_volume.uuid`
-      #   * `clone.split_complete_percent`
-      #   * `clone.split_estimate`
-      #   * `clone.split_initiated`
-      #   * `efficiency.*`
-      #   * `error_state.*`
-      #   * `files.*`
-      #   * `nas.export_policy.id`
-      #   * `nas.gid`
-      #   * `nas.path`
-      #   * `nas.security_style`
-      #   * `nas.uid`
-      #   * `nas.unix_permissions`
-      #   * `snaplock.*`
-      #   * `restore_to.*`
-      #   * `snapshot_policy.uuid`
-      #   * `quota.*`
-      #   * `qos.*`
-      #   * `flexcache_endpoint_type`
-      #   * `space.block_storage_inactive_user_data`
-      #   * `space.capacity_tier_footprint`
-      #   * `space.performance_tier_footprint`
-      #   * `space.local_tier_footprint`
-      #   * `space.footprint`
-      #   * `space.over_provisioned`
-      #   * `space.metadata`
-      #   * `space.total_footprint`
-      #   * `space.logical_space.*`
-      #   * `space.snapshot.*`
-      #   * `guarantee.*`
-      #   * `autosize.*`
-      #   * `movement.*`
-      #   * `statistics.*`
+        ### Expensive properties
+        There is an added cost to retrieving values for these properties. They are not included by default in GET results and must be explicitly requested using the `fields` query parameter. See [`Requesting specific fields`](#Requesting_specific_fields) to learn more.
+        * `is_svm_root`
+        * `analytics.*`
+        * `application.*`
+        * `encryption.*`
+        * `clone.parent_snapshot.name`
+        * `clone.parent_snapshot.uuid`
+        * `clone.parent_svm.name`
+        * `clone.parent_svm.uuid`
+        * `clone.parent_volume.name`
+        * `clone.parent_volume.uuid`
+        * `clone.split_complete_percent`
+        * `clone.split_estimate`
+        * `clone.split_initiated`
+        * `efficiency.*`
+        * `error_state.*`
+        * `files.*`
+        * `nas.export_policy.id`
+        * `nas.gid`
+        * `nas.path`
+        * `nas.security_style`
+        * `nas.uid`
+        * `nas.unix_permissions`
+        * `snaplock.*`
+        * `restore_to.*`
+        * `snapshot_policy.uuid`
+        * `quota.*`
+        * `qos.*`
+        * `flexcache_endpoint_type`
+        * `space.block_storage_inactive_user_data`
+        * `space.capacity_tier_footprint`
+        * `space.performance_tier_footprint`
+        * `space.local_tier_footprint`
+        * `space.footprint`
+        * `space.over_provisioned`
+        * `space.metadata`
+        * `space.total_footprint`
+        * `space.logical_space.*`
+        * `space.snapshot.*`
+        * `guarantee.*`
+        * `autosize.*`
+        * `movement.*`
+        * `statistics.*`
   
-      #   ### Related ONTAP commands
-      #   * `volume show`
-      #   * `volume clone show`
-      #   * `volume efficiency show`
-      #   * `volume encryption show`
-      #   * `volume flexcache show`
-      #   * `volume flexgroup show`
-      #   * `volume move show`
-      #   * `volume quota show`
-      #   * `volume show-space`
-      #   * `volume snaplock show`
+        ### Related ONTAP commands
+        * `volume show`
+        * `volume clone show`
+        * `volume efficiency show`
+        * `volume encryption show`
+        * `volume flexcache show`
+        * `volume flexgroup show`
+        * `volume move show`
+        * `volume quota show`
+        * `volume show-space`
+        * `volume snaplock show`
   
       operationId: volume_collection_get
 
@@ -2965,6 +2965,7 @@ paths:
           schema:
             $ref: "#/definitions/error_response"
 
+# what does this do??
 definitions:
   volume:
     type: object
