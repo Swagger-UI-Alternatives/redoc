@@ -27,6 +27,8 @@ export class SpecStore {
     this.info = new ApiInfoModel(this.parser);
     this.externalDocs = this.parser.spec.externalDocs;
     this.contentItems = MenuBuilder.buildStructure(this.parser, this.options);
+    // Jarod-added J-version let's get the version!
+    // this.info.version = MenuBuilder.
     this.securitySchemes = new SecuritySchemesModel(this.parser);
     this.webhooks = new WebhookModel(this.parser, options, this.parser.spec['x-webhooks']);
   }

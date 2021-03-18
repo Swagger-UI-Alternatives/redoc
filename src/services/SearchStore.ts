@@ -34,6 +34,7 @@ export class SearchStore<T> {
           let params: string = "";
           // only operation types have the parameters/responses/etc.
           if(group.type === 'operation') {
+            console.log("operation "+ group.httpVerb +" group.parameters");
             console.log(group.parameters);
             const p = group.parameters;
             params = this.stringParamBuilder(p);
@@ -77,139 +78,21 @@ export class SearchStore<T> {
 
   // function that adds all the parameters to a string to be searched for
   stringParamBuilder(parameters: FieldModel[]) {
-    console.log("method "+ parameters);
+    console.log("in method stringParamBuilder");
     let s = "";
     parameters.forEach(parameter => {
       console.log(parameter);
+      console.log(parameter.in);
+      console.log("style");
+      console.log(parameter.style);
       if(parameter.in === "query") {
         s += parameter.name + " ";
         s += parameter.description + "\n";
       }
+      
+
     });
     console.log(s);
     return s;
   }
-
-  // static getOperationFields(
-  //   parent: OperationModel,
-  //   depth: number,
-  // ): FieldModel[] {
-  //   // our fields for an operation
-  //   const fields: FieldModel[] = [];
-
-  //   if (parent.parameters !== undefined) {
-  //     const parameters = parent.parameters;
-  //     fields.push(...this.getFields(parameters, parent, 'parameters', depth));
-  //   }
-
-  //   if (parent.requestBody !== undefined) {
-  //     const body = parent.requestBody;
-  //     const bodyFields: FieldModel[] = [];
-
-  //     if (body.content) {
-  //       const mediaTypes = body.content.mediaTypes;
-  //       mediaTypes.forEach(mediaType => {
-  //         const type = mediaType.name.split('/')[1];
-  //         const schema = mediaType.schema;
-  //         if (schema && schema.oneOf) { // One of
-  //           let active = 0;
-  //           schema.oneOf.forEach(s => {
-  //             bodyFields.push(...this.getFields(s.fields, parent, 'body/' + type + '/' + s.title, depth).map(f => {
-  //               f.containerContentModel = body.content;
-  //               f.activeContentModel = mediaTypes.indexOf(mediaType);
-  //               f.containerOneOf = schema;
-  //               f.activeOneOf = active;
-  //               return f;
-  //             }));
-  //             active++;
-  //           });
-  //         } else if (schema && schema.fields) {
-  //           bodyFields.push(...this.getFields(schema.fields, parent, 'body/' + type, depth).map(f => {
-  //             f.containerContentModel = body.content;
-  //             f.activeContentModel = mediaTypes.indexOf(mediaType);
-  //             return f;
-  //           }));
-  //         }
-  //       });
-  //       fields.push(...bodyFields);
-  //     }
-  //   }
-
-  //   if (parent.responses !== undefined) {
-  //     const responses = parent.responses;
-  //     const responseFields: FieldModel[] = [];
-
-  //     responses.forEach(response => {
-  //       responseFields.push(...this.getFields(response.headers, parent, 'responses/' + response.code + '/headers', depth).map(r => {
-  //         r.responseContainer = response;
-  //         return r;
-  //       }));
-
-  //       if (response.content) {
-  //         const mediaTypes = response.content.mediaTypes;
-  //         mediaTypes.forEach(mediaType => {
-  //           const type = mediaType.name.split('/')[1];
-  //           const schema = mediaType.schema;
-  //           if (schema && schema.oneOf) { // One of
-  //             let active = 0;
-  //             schema.oneOf.forEach(s => {
-  //               responseFields.push(...this.getFields(s.fields, parent, 'responses/' + response.code + '/' + type + '/' + s.title, depth).map(f => {
-  //                 f.responseContainer = response;
-  //                 f.containerContentModel = response.content;
-  //                 f.activeContentModel = mediaTypes.indexOf(mediaType);
-  //                 f.containerOneOf = schema;
-  //                 f.activeOneOf = active;
-  //                 return f;
-  //               }));
-  //               active++;
-  //             });
-  //           } else if (schema && schema.fields) {
-  //             responseFields.push(...this.getFields(schema.fields, parent, 'responses/' + response.code + '/' + type, depth).map(f => {
-  //               f.responseContainer = response;
-  //               f.containerContentModel = response.content;
-  //               f.activeContentModel = mediaTypes.indexOf(mediaType);
-  //               return f;
-  //             }));
-  //           }
-  //         });
-  //       }
-  //     });
-  //     fields.push(...responseFields);
-  //   }
-
-  //   return fields;
-  // }
-
-  // static getFields(fields, parent, section, depth): FieldModel[] {
-  //   const temp: FieldModel[] = [];
-  //   fields.forEach(field => {
-  //     temp.push(...this.getDeepFields(field, parent, section, depth));
-  //   });
-  //   return temp.filter((field, index, self) => {
-  //     return index === self.findIndex(f => {
-  //       return f.id === field.id;
-  //     });
-  //   });
-  // }
-
-  // static getDeepFields(field: FieldModel, parent: ContentItemModel, section: string, depth: number): FieldModel[] {
-  //   const temp: FieldModel[] = [];
-
-  //   field.id = parent.id.includes(section) ? parent.id + '/' + safeSlugify(field.name) : parent.id + '/' + section + '/' + safeSlugify(field.name);
-  //   field.parent = parent;
-  //   temp.push(field);
-
-  //   if (field.schema.fields !== undefined) {
-  //     field.schema.fields.forEach(fieldInner => {
-  //       temp.push(...this.getDeepFields(fieldInner, field, section, depth + 1));
-  //     });
-  //   }
-  //   if (field.schema.items !== undefined && field.schema.items.fields !== undefined) {
-  //     field.schema.items.fields.forEach(fieldInner => {
-  //       temp.push(...this.getDeepFields(fieldInner, field, section, depth + 1));
-  //     });
-  //   }
-
-  //   return temp;
-  // }
 }

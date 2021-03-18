@@ -11,7 +11,7 @@ import { GROUP_DEPTH } from './MenuBuilder';
 export type MenuItemGroupType = 'group' | 'tag' | 'section';
 // Jarod-added J-endDocTag 'doc' does nothing... yet? idk. the x-ntap-long-description is type: "operation" but also has a parser field.
 // it is considered an httpverb but you can tell redoc doesn't exactly know what to do with it.
-export type MenuItemType = MenuItemGroupType | 'operation' | 'doc';
+export type MenuItemType = MenuItemGroupType | 'operation'; // | 'doc';
 
 /** Generic interface for MenuItems */
 export interface IMenuItem {
@@ -19,10 +19,9 @@ export interface IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
-  // Jarod-added J-docTag J-endDocTag ??
-  longDescription?: string;
-  // Jarod-added J-intro
-  introduced?: string;
+  longDescription?: string; // Jarod-added J-docTag
+  introducedIn?: string;      // Jarod-added J-intro J-version
+  deprecatedIn?: string;    // Jarod-added J-dep J-version
   depth: number;
   active: boolean;
   expanded: boolean;

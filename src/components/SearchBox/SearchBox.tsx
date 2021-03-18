@@ -157,7 +157,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       item: this.props.getItemById(res.meta)!,
       score: res.score,
     }));
-    
+
     results.sort((a, b) => b.score - a.score);
 
     return (

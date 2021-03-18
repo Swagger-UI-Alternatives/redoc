@@ -50,11 +50,12 @@ export class OperationModel implements IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
-  // Jarod-added J-endDocTag added these 2 lines
-  longDescription?: string;
+
+  longDescription?: string; // Jarod-added J-endDocTag
+  introducedIn?: string;    // Jarod-added J-intro J-version
+  deprecatedIn?: string;    // Jarod-added J-dep J-version
+
   // type: 'operation' | 'doc';
-  // Jarod-added J-intro? idk how the region affects anything
-  introduced?: string;
 
   type = 'operation' as const;
 
@@ -93,42 +94,37 @@ export class OperationModel implements IMenuItem {
   ) {
     makeObservable(this);
 
-
-
     this.pointer = operationSpec.pointer;
-
     this.description = operationSpec.description;
     this.parent = parent;
     this.externalDocs = operationSpec.externalDocs;
 
-    this.deprecated = !!operationSpec.deprecated;
-    
-    // Jarod-added J-endDocTag trying to change the sidebar name to doc instead of overflown long description name
-    if(operationSpec.httpVerb === 'x-ntap-long-description') {
-      this.httpVerb = 'doc';
-    } else {
-      this.httpVerb = operationSpec.httpVerb;
-    }
-    // this.httpVerb = operationSpec.httpVerb;
     this.deprecated = !!operationSpec.deprecated;
     this.operationId = operationSpec.operationId;
     this.path = operationSpec.pathName;
     this.isCallback = isCallback;
     this.isWebhook = !!operationSpec.isWebhook;
 
+    // Jarod-added J-endDocTag change the sidebar name to doc instead of overflown long description name
+    if(operationSpec.httpVerb === 'x-ntap-long-description') {
+      this.httpVerb = 'doc';
+    } else {
+      this.httpVerb = operationSpec.httpVerb;
+    }
     // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to
-    // the summary, then the operationId, then the first 50ish chars of the endpoint's description
+    // the summary, then the operationId, then the first 50 chars of the endpoint's description
     this.name = getOperationSummary(operationSpec);
-    // Jarod-added J-endDocTag comment
-    console.log("httpVerb "+this.httpVerb);
-    console.log("operationId "+this.operationId);
-    // should the name be the path? idk yet
-    this.name = this.path;
-    console.log("name: should come after "+this.name);
 
-    // Jarod-added J-intro
-    this.introduced = operationSpec["x-ntap-introduced"];
+    this.name = this.path;  // Jarod-added J-endDocTag assign the name to be the path
+
+    // assigns the values of the ONTAP versioning keys to Operation fields
+    this.introducedIn = operationSpec["x-ntap-introduced"]; // Jarod-added J-intro J-version
+    this.deprecatedIn = operationSpec["x-ntap-deprecated"]; // Jarod-added J-dep J-version
     
+    // assign deprecated to true if there is an ONTAP deprecation name specified
+    if(this.deprecatedIn !== undefined) { // Jarod-added J-dep J-version
+      this.deprecated = true;
+    }
 
     if (this.isCallback) {
       // NOTE: Callbacks by default should not inherit the specification's global `security` definition.

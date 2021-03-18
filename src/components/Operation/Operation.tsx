@@ -19,8 +19,9 @@ import { ResponseSamples } from '../ResponseSamples/ResponseSamples';
 import { SecurityRequirements } from '../SecurityRequirement/SecurityRequirement';
 import { shortenHTTPVerb } from '../../utils/openapi';
 
-// J-added J-badge
+// Jarod-added J-badge
 import { OperationBadge } from './styled.elements';
+import { VERSION } from '../../services/MenuBuilder'; // Jarod-added J-version
 
 const OperationRow = styled(Row)`
   backface-visibility: hidden;
@@ -38,12 +39,58 @@ export interface OperationProps {
 
 @observer
 export class Operation extends React.Component<OperationProps> {
+
+  handleVersioning(item: OperationModel) {
+    // hopefully we have the latest version at this point...
+    // if this is a doc operation then do nothing.
+    if(item.httpVerb === 'doc') {
+      return(undefined);
+    }
+
+    // Note: I want to assign deprecated=true if deprecatedIn is assigned in Operation. 
+    // Before rendering of the menuitems and the contentitems.
+
+    // if the operation is deprecated, then
+    if(item.deprecated) {
+      // if deprecatedIn is not undefined, then give the version it is deprecated
+      if(item.deprecatedIn !== 'DO_NOT_DISPLAY' && item.deprecatedIn !== undefined) {
+        return(
+          <Badge type="warning"> Deprecated in v{item.deprecatedIn} </Badge>
+        );
+      }
+      // if deprecated=true but version is not specified
+      else {
+        return(
+          <Badge type="warning"> Deprecated </Badge>
+        );
+      }
+    }
+    // else if introducedIn is not undefined
+    else if(item.introducedIn !== 'DO_NOT_DISPLAY'  && item.introducedIn !== undefined) {
+      // if the introducedIn is equal to the latest version, then do New in
+      if(item.introducedIn === VERSION) {
+        return(
+          <Badge type="newIn"> New in v{item.introducedIn} </Badge>
+        );
+      }
+      // else the introducedIn prints Introduced in
+      else {
+        return(
+          <Badge type="introIn"> Introduced in v{item.introducedIn} </Badge>
+        );
+      }
+    }
+    // otherwise
+    else {
+      return(undefined);
+    }
+  }
+
   render() {
     const { operation } = this.props;
-    // Jarod-added this prints out all of our operations in storage!
-    console.log("operation");
-    console.log(operation);
-    const { name: summary, description, deprecated, externalDocs, isWebhook } = operation;
+
+    const { name: summary, description, externalDocs, isWebhook } = operation;  // J-version
+    // const { name: summary, description, deprecated, externalDocs, isWebhook } = operation;
     const hasDescription = !!(description || externalDocs);
 
     return (
@@ -56,7 +103,7 @@ export class Operation extends React.Component<OperationProps> {
                 <ShareLink to={operation.id} />
                 {/* J-badge add OperationBadge here. Also have to center these 3 things */}
                 <OperationBadge type={operation.httpVerb}>{shortenHTTPVerb(operation.httpVerb)}</OperationBadge>
-                {summary} {deprecated && <Badge type="warning"> Deprecated </Badge>}
+                {summary} {this.handleVersioning(operation)}
                 {isWebhook && <Badge type="primary"> Webhook </Badge>}
               </H2>
               {options.pathInMiddlePanel && !isWebhook && (

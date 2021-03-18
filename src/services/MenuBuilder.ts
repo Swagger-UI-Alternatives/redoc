@@ -40,6 +40,7 @@ export interface TagGroup {
 }
 
 export const GROUP_DEPTH = 0;
+export let VERSION: string = '';  // Jarod-added J-version
 export type ContentItemModel = GroupModel | OperationModel;
 
 export class MenuBuilder {
@@ -207,6 +208,17 @@ export class MenuBuilder {
     for (const operationInfo of tag.operations) {
       const operation = new OperationModel(parser, operationInfo, parent, options);
       operation.depth = depth;
+      // Jarod-added J-version
+      if(operation.introducedIn !== undefined) {
+        if(VERSION === '') {
+          VERSION = operation.introducedIn;
+        }
+        else {
+          if(operation.introducedIn > VERSION) {
+            VERSION = operation.introducedIn;
+          }
+        }
+      }
       res.push(operation);
     }
     return res;
@@ -240,17 +252,10 @@ export class MenuBuilder {
           console.log(operationName);
           const operationInfo = path[operationName];
           let operationTags = operationInfo.tags;
-          // Jarod-added J-intro this is to check if x-ntap-introduced is being received. it is.
+          // Jarod-added J-intro this is to check if x-ntap-introducedIn is being received. it is.
           // try to add the introduced string to the operation
           console.log("operationInfo:");
           console.log(operationInfo);
-
-
-
-
-
-
-
 
           if (!operationTags || !operationTags.length) {
             // empty tag
@@ -277,8 +282,6 @@ export class MenuBuilder {
               pathParameters: path.parameters || [],
               pathServers: path.servers,
               isWebhook: !!isWebhook,
-              // Jarod-added J-intro
-              introduced: operationInfo['x-ntap-introduced'],
             });
           }
         }

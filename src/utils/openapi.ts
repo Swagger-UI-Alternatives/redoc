@@ -49,9 +49,7 @@ export function getStatusCodeType(statusCode: string | number, defaultAsError = 
 }
 
 const operationNames = {
-  // Jarod-added J-endDocTag
-  // but I want this operationName to be <doc> potentially
-  'x-ntap-long-description': true,
+  'x-ntap-long-description': true,  // Jarod-added J-endDocTag
   get: true,
   post: true,
   put: true,
@@ -589,7 +587,6 @@ export function isRedocExtension(key: string): boolean {
     'x-displayName': true,
     'x-examples': true,
     'x-ignoredHeaderParameters': true,
-    // set to false to check if the x-logo gets parsed from input yaml file
     'x-logo': true,
     'x-nullable': true,
     'x-servers': true,
@@ -597,10 +594,10 @@ export function isRedocExtension(key: string): boolean {
     'x-traitTag': true,
     'x-additionalPropertiesName': true,
     'x-explicitMappingOnly': true,
-    // Jarod-added J-docTag
-    'x-ntap-long-description': true,
-    // Jarod-added J-intro
-    'x-ntap-introduced': true,
+    // ONTAP Redoc extensions
+    'x-ntap-long-description': true,  // Jarod-added J-docTag
+    'x-ntap-introduced': true,        // Jarod-added J-intro J-version
+    'x-ntap-deprecated': true,        // Jarod-added J-dep J-version
   };
 
   return key in redocExtensions;
