@@ -52,7 +52,7 @@ function initEmpty() {
   builder = new lunr.Builder();
   builder.field('title'), { boost: 10 };
   builder.field('description');
-  builder.field('longDescription'); //anthony added longdescription
+  builder.field('longDescription'); 
   builder.ref('ref');
 
   builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
@@ -64,12 +64,11 @@ function initEmpty() {
 
 initEmpty();
 
-const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
+const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*'; 
 
-export function add<T>(title: string, description: string, longDescription: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, meta?: T) { 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; //anthony added longdescription
-  //console.log(item); //anthony
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; 
   builder.add(item);
 }
 

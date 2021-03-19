@@ -43,6 +43,9 @@ export class MenuItem extends React.Component<MenuItemProps> {
 
   render() {
     const { item, withoutChildren } = this.props;
+    if(item.type === 'field' && this.props['data-role'] != 'search:result') { //EXTENDED SEARCH
+      return null;
+    }
     return (
       <MenuItemLi onClick={this.activate} depth={item.depth} data-item-id={item.id}>
         {item.type === 'operation' ? (

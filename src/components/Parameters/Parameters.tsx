@@ -31,6 +31,7 @@ export class Parameters extends React.PureComponent<ParametersProps> {
     params.forEach(param => {
       safePush(res, param.in, param);
     });
+    console.log(res); //debug
     return res;
   }
 

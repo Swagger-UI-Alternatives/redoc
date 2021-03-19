@@ -6,6 +6,8 @@ import Worker from './SearchWorker.worker';
 
 
 // SearchStore stores the information to be searched
+
+let operationId; 
 function getWorker() {
   let worker: new () => Worker;
   if (IS_BROWSER) {
@@ -25,27 +27,27 @@ export class SearchStore<T> {
   searchWorker = getWorker();
 
   indexItems(groups: Array<IMenuItem | OperationModel>) {
-    // print out some useful stuff
-    // console.log("groups");
-    // console.log(groups);
-    const recurse = items => {
-      items.forEach(group => {
-        if(group.type !== 'group') {
-          // let params: string = "";
-          // only operation types have the parameters/responses/etc.
-          // if(group.type === 'operation') {
-          //   console.log("operation "+ group.httpVerb +" group.parameters");
-          //   console.log(group.parameters);
-          //   const p = group.parameters;
-          //   params = this.stringParamBuilder(p);
-          // }
-          this.add(group.name, group.description, group.longDescription || '', group.id); // anthony added longdescription
-        }
-        recurse(group.items);
-      });
-    };
+    //console.log(groups);
+    
+    groups.forEach(group => {
+      
+      if (group.type === 'operation') {
+        operationId = group.id;
+        // @ts-ignore
+        this.add(group.name, group.description, group.longDescription || '', group.id);
+      }
+      else if (group.type === 'field') {
+        this.add(group.name, group.description || '', group.longDescription || '', operationId);
+      }
+      else if(group.type !== 'group'){
+        //this.add(group.name, group.description || '', group.longDescription!, group.id);
+        this.add(group.name, group.description || '', group.longDescription || '', group.id as any);
 
-    recurse(groups);
+      }
+      
+
+    });
+
     this.searchWorker.done();
   }
 

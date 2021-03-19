@@ -47,6 +47,10 @@ export interface SearchBoxState {
   // activeItemIdx is the index of the results
   activeItemIdx: number;
 }
+export interface Aggregate {
+  item: IMenuItem;
+  score: number;
+}
 // SearchBox contains the props from SearchBoxProps and a SearchBoxState
 // React.PureComponent is similar to React.Component. The difference between them is that React.Component doesn’t implement shouldComponentUpdate(), but React.PureComponent implements it with a shallow prop and state comparison.
 // If your React component’s render() function renders the same result given the same props and state, you can use React.PureComponent for a performance boost in some cases.
@@ -152,12 +156,42 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   };
 
   render() {
+
     const { activeItemIdx } = this.state;
     const results = this.state.results.map(res => ({
       item: this.props.getItemById(res.meta)!,
       score: res.score,
     }));
+    //start anthony
+    let currId = '';
+    let index = 0,count=0;
+    const aggResults: Aggregate[] = []; 
+    results.sort(this.compare);
+    
+    results.forEach(curr => {
+      if(curr !== undefined) {
 
+        if(currId === ''){
+          currId = curr.item.id;
+          aggResults.push(curr); //push first onto results
+          count++;
+        }
+        else if(curr.item.id === currId){
+          aggResults[index].score += curr.score;
+          count++;
+        }
+        else {
+          aggResults[index].score = aggResults[index].score/count;
+          currId = curr.item.id;
+          aggResults.push(curr);
+          index++;
+          count=1;
+        }
+        
+      }
+    });
+   console.log(aggResults);
+   aggResults.sort((a, b) => b.score - a.score);
     results.sort((a, b) => b.score - a.score);
 
     return (
@@ -172,14 +206,14 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           type="text"
           onChange={this.search}
         />
-        {results.length > 0 && (
+        {aggResults.length > 0 && (
           <PerfectScrollbarWrap
             options={{
               wheelPropagation: false,
             }}
           >
             <SearchResultsBox data-role="search:results">
-              {results.map((res, idx) => (
+              {aggResults.map((res, idx) => (
                 <MenuItem
                   item={Object.create(res.item, {
                     active: {
@@ -198,4 +232,15 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       </SearchWrap>
     );
   }
+
+  compare( a, b ) {
+    if ( a.item.id < b.item.id ){
+      return -1;
+    }
+    if ( a.item.id > b.item.id ){
+      return 1;
+    }
+    return 0;
+  }
+  
 }
