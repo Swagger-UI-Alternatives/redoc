@@ -25,13 +25,14 @@ export const DownloadButton = styled.a`
   ${extensionsHook('DownloadButton')};
 `;
 
-export const authorizeButton = styled.a`
-  border: 2px solid ${props => props.theme.colors.primary.main};
+export const AuthorizeButton = styled.a`
+  border: 1px solid ${props => props.theme.colors.primary.main};
   color: ${props => props.theme.colors.primary.main};
   font-weight: normal;
+  text-align: center;
   margin-left: 0.5em;
   padding: 4px 8px 4px;
-  display: inline-block;
+  display: block;
   text-decoration: none;
   cursor: pointer;
 `;
