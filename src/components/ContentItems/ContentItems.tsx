@@ -42,6 +42,8 @@ export class ContentItem extends React.Component<ContentItemProps> {
       case 'group':
         content = null;
         break;
+      case 'field': //EXTENDED SEARCH
+        return null;
       case 'tag':
       case 'section':
         content = <SectionItem {...this.props} />;

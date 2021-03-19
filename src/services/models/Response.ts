@@ -60,4 +60,9 @@ export class ResponseModel {
   toggle() {
     this.expanded = !this.expanded;
   }
+  //EXTENDED SEARCH START
+  expand() {
+    this.expanded = true;
+  }
+  //EXTENDED SEARCH END
 }

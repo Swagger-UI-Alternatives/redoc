@@ -185,7 +185,7 @@ export class OperationModel implements IMenuItem {
   toggle() {
     this.expanded = !this.expanded;
   }
-
+  @action //EXTENDED SEARCH
   expand() {
     if (this.parent) {
       this.parent.expand();
@@ -248,7 +248,7 @@ export class OperationModel implements IMenuItem {
     if (this.options.requiredPropsFirst) {
       return sortByRequired(_parameters);
     }
-
+    console.log(_parameters);
     return _parameters;
   }
 

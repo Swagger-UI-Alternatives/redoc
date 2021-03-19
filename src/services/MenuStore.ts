@@ -1,6 +1,6 @@
 import { action, observable, makeObservable } from 'mobx';
 import { querySelector } from '../utils/dom';
-import { SpecStore } from './models';
+import { FieldModel, SpecStore } from './models';
 
 import { history as historyInst, HistoryService } from './HistoryService';
 import { ScrollService } from './ScrollService';
@@ -11,7 +11,7 @@ import { GROUP_DEPTH } from './MenuBuilder';
 export type MenuItemGroupType = 'group' | 'tag' | 'section';
 // Jarod-added J-endDocTag 'doc' does nothing... yet? idk. the x-ntap-long-description is type: "operation" but also has a parser field.
 // it is considered an httpverb but you can tell redoc doesn't exactly know what to do with it.
-export type MenuItemType = MenuItemGroupType | 'operation' | 'doc';
+export type MenuItemType = MenuItemGroupType | 'operation' | 'field'; //EXTENDED SEARCH added 'field'
 
 /** Generic interface for MenuItems */
 export interface IMenuItem {
@@ -70,6 +70,7 @@ export class MenuStore {
   items: IMenuItem[];
   flatItems: IMenuItem[];
 
+  imagesLoaded: boolean = false;
   /**
    * cached flattened menu items to support absolute indexing
    */
@@ -137,7 +138,17 @@ export class MenuStore {
       itemIdx += step;
     }
 
-    this.activate(this.flatItems[itemIdx], true, true);
+    //this.activate(this.flatItems[itemIdx], true, true); EXTENDED SEARCH REMOVE THIS LINE AND ADD THE BELOW CODE
+    let item: FieldModel | undefined = this.flatItems[itemIdx] as FieldModel;
+    while (item && item.type === 'field' && item.parent && item.parent.type === 'field' && !item.parent.expanded ||
+            item && item.containerContentModel !== undefined && item.containerContentModel.activeMimeIdx !== item.activeContentModel ||
+            item && item.responseContainer && !item.responseContainer.expanded ||
+            item && item.containerOneOf !== undefined && item.containerOneOf.activeOneOf !== item.activeOneOf) {
+      itemIdx += step;
+      item = this.flatItems[itemIdx] as FieldModel;
+    }
+
+    this.activate(item, true, true);
   };
 
   /**
@@ -149,7 +160,13 @@ export class MenuStore {
       return;
     }
     let item: IMenuItem | undefined;
-
+    //EXTENDED SEARCH ADD
+      // Make jumps possible even if last char in URL is '/'
+      if (id[id.length - 1] === '/') {
+        id = id.slice(0, -1);
+        this.history.replace(id, false);
+      }
+      //END EXTENDED SEARCH
     item = this.flatItems.find(i => i.id === id);
     if (item) {
       this.activateAndScroll(item, false);
@@ -245,7 +262,9 @@ export class MenuStore {
     }
     item.deactivate();
     while (item !== undefined) {
-      item.collapse();
+      if (item.type !== 'field') { //EXTENDED SEARCH
+        item.collapse();
+      }
       item = item.parent;
     }
   }
@@ -273,7 +292,18 @@ export class MenuStore {
    * scrolls to active section
    */
   scrollToActive(): void {
-    this.scroll.scrollIntoView(this.getElementAt(this.activeItemIdx));
+    // remove extended search this.scroll.scrollIntoView(this.getElementAt(this.activeItemIdx)); ADD THE BELOW CODE
+    const active = this.activeItemIdx;
+    const element = this.getElementAt(active);
+    if (element === null || !this.imagesLoaded) {
+      setTimeout(() => {
+        this.activeItemIdx = active;
+        this.scrollToActive();
+        this.imagesLoaded = true;
+      }, this.imagesLoaded ? 500 : 100);
+    } else {
+      this.scroll.scrollIntoView(element);
+    } //END ADDED CODE
   }
 
   dispose() {
