@@ -50,7 +50,7 @@ let index: Promise<lunr.Index>;
 
 function initEmpty() {
   builder = new lunr.Builder();
-  builder.field('title');
+  builder.field('title'), { boost: 10 };
   builder.field('description');
   builder.field('longDescription'); //anthony added longdescription
   builder.ref('ref');
