@@ -52,7 +52,6 @@ function initEmpty() {
   builder = new lunr.Builder();
   builder.field('title');
   builder.field('description');
-  builder.field('fieldModel');  // added
   builder.field('longDescription'); //anthony added longdescription
   builder.ref('ref');
 
@@ -67,9 +66,9 @@ initEmpty();
 
 const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
 
-export function add<T>(title: string, description: string, fieldModel: string, longDescription: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), fieldModel: fieldModel.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; //anthony added longdescription
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; //anthony added longdescription
   //console.log(item); //anthony
   builder.add(item);
 }

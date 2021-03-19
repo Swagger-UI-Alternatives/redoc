@@ -68,7 +68,7 @@ export class ApiInfo extends React.Component<ApiInfoProps> {
       )) ||
       null;
 
-    const version = (info.version && <span>({info.version})</span>) || null;
+    const version = (info.version && <span>(v{info.version})</span>) || null;
 
     return (
       <Section>

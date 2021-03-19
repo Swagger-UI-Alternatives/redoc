@@ -289,4 +289,7 @@ export class MenuBuilder {
     }
     return tags;
   }
+  static getVersion(): string {  // Jarod-added J-version to assign version to the version field in API Info
+    return VERSION;
+  }
 }
