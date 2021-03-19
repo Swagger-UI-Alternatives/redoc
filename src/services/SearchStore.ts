@@ -61,7 +61,6 @@ export class SearchStore<T> {
   }
 
   search(q: string) {
-    console.log("making a search");
     return this.searchWorker.search<T>(q);
   }
 
@@ -78,4 +77,22 @@ export class SearchStore<T> {
       this.searchWorker.fromExternalJS(path, exportName)
     }
   }
+
+  // function that adds all the parameters to a string to be searched for
+  // stringParamBuilder(parameters: FieldModel[]) {
+  //   console.log("in method stringParamBuilder");
+  //   let s = "";
+  //   parameters.forEach(parameter => {
+  //     console.log(parameter);
+  //     console.log(parameter.in);
+  //     console.log("style");
+  //     console.log(parameter.style);
+  //     if(parameter.in === "query") {
+  //       s += parameter.name + " ";
+  //       s += parameter.description + "\n";
+  //     }
+  //   });
+  //   console.log(s);
+  //   return s;
+  // }
 }

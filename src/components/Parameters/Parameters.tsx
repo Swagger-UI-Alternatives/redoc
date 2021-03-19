@@ -37,18 +37,15 @@ export class Parameters extends React.PureComponent<ParametersProps> {
 
   render() {
     const { body, parameters = [] } = this.props;
+
     if (body === undefined && parameters === undefined) {
       return null;
     }
 
     const paramsMap = this.orderParams(parameters);
-
     const paramsPlaces = parameters.length > 0 ? PARAM_PLACES : [];
-
     const bodyContent = body && body.content;
-
     const bodyDescription = body && body.description;
-
     return (
       <>
         {paramsPlaces.map(place => (

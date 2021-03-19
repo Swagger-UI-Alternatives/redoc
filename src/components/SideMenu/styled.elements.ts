@@ -167,11 +167,17 @@ export const MenuItemTitle = styled.span<{ width?: string }>`
 `;
 
 // Jarod-added J-intro
-// export const IntroducedIn = styled.p<{ type?: string }>`
-//   text-align: left;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// `;
+// had to zero out the padding and margin to get IntroducedIn to behave like the endoint text.
+// also want the font-size to be 90% of the endpoint text and change opacity for a lighter grey.
+// text-decoration: none 
+// gets overridden
+export const Versioning = styled.p`
+  margin: 0;
+  padding: 0;
+
+  font-size: 90%;
+  opacity: 0.7;
+`;
 
 export const RedocAttribution = styled.div`
   ${({ theme }) => `

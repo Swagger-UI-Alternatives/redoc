@@ -10,10 +10,12 @@ import { StyledMarkdownBlock } from '../Markdown/styled.elements';
 import {
   ApiHeader,
   DownloadButton,
+  AuthorizeButton, //added by Madi
   InfoSpan,
   InfoSpanBox,
   InfoSpanBoxWrap,
 } from './styled.elements';
+import { AuthorizationLogin } from '../AuthorizationLogin/AuthorizationLogin'; //added by madi
 
 export interface ApiInfoProps {
   store: AppStore;
@@ -21,6 +23,18 @@ export interface ApiInfoProps {
 
 @observer
 export class ApiInfo extends React.Component<ApiInfoProps> {
+
+  state = {
+    show: false
+  };
+
+  showAuthLogin = e => {
+    console.log(e);
+    this.setState({
+      show: !this.state.show
+    });
+  };
+
   handleDownloadClick = e => {
     if (!e.target.href) {
       e.target.href = this.props.store.spec.info.downloadLink;
@@ -68,7 +82,7 @@ export class ApiInfo extends React.Component<ApiInfoProps> {
       )) ||
       null;
 
-    const version = (info.version && <span>({info.version})</span>) || null;
+    const version = (info.version && <span>(v{info.version})</span>) || null;
 
     return (
       <Section>
@@ -102,7 +116,16 @@ export class ApiInfo extends React.Component<ApiInfoProps> {
             </StyledMarkdownBlock>
             <Markdown source={store.spec.info.description} data-role="redoc-description" />
             {externalDocs && <ExternalDocumentation externalDocs={externalDocs} />}
-          </MiddlePanel>
+              {<p>
+                <AuthorizeButton
+                  target="_blank"
+                  onClick={this.showAuthLogin}>
+                  Authorize &#128274;
+                </AuthorizeButton>
+                <AuthorizationLogin onClose={this.showAuthLogin} show={this.state.show}>
+                </AuthorizationLogin>
+              </p>}
+            </MiddlePanel>
         </Row>
       </Section>
     );

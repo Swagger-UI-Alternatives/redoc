@@ -40,14 +40,13 @@ export interface OpenAPIPaths {
 export interface OpenAPIRef {
   $ref: string;
 }
-// 
+
 export type Referenced<T> = OpenAPIRef | T;
 
 export interface OpenAPIPath {
   summary?: string;
   description?: string;
-  // Jarod-added J-endDocTag
-  doc?: 'x-ntap-long-description';
+  doc?: 'x-ntap-long-description';  // Jarod-added J-endDocTag
   get?: OpenAPIOperation;
   put?: OpenAPIOperation;
   post?: OpenAPIOperation;
@@ -81,8 +80,8 @@ export interface OpenAPIOperation {
   servers?: OpenAPIServer[];
   'x-codeSamples'?: OpenAPIXCodeSample[];
   'x-code-samples'?: OpenAPIXCodeSample[]; // deprecated
-  // Jarod-added J-intro
-  'x-ntap-introduced'?: string;
+  introducedIn?: string;    // Jarod-added J-intro J-version
+  deprecatedIn?: string;  // Jarod-added J-dep J-version
 }
 
 export interface OpenAPIParameter {
@@ -129,6 +128,7 @@ export interface OpenAPISchema {
   anyOf?: OpenAPISchema[];
   allOf?: OpenAPISchema[];
   not?: OpenAPISchema;
+  
   title?: string;
   multipleOf?: number;
   maximum?: number;
@@ -256,8 +256,7 @@ export interface OpenAPISecurityScheme {
 export interface OpenAPITag {
   name: string;
   description?: string;
-  // Jarod-added J-docTag
-  longDescription?: string;
+  longDescription?: string;  // Jarod-added J-docTag
   externalDocs?: OpenAPIExternalDocumentation;
   'x-displayName'?: string;
 }

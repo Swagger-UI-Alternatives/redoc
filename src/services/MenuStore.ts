@@ -19,10 +19,9 @@ export interface IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
-  // Jarod-added J-docTag J-endDocTag ??
-  longDescription?: string;
-  // Jarod-added J-intro
-  introduced?: string;
+  longDescription?: string;                                           // Jarod-added J-docTag
+  introducedIn?: string;                                              // Jarod-added J-intro J-version
+  deprecatedIn?: string;                                              // Jarod-added J-dep J-version
   depth: number;
   active: boolean;
   expanded: boolean;

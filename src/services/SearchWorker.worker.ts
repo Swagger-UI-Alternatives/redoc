@@ -29,6 +29,7 @@ export interface SearchDocument {
   title: string;
   description: string;
   longDescription: string; //anthony added longdescription
+  fieldModel: string;       // added
   id: string;
 }
 
