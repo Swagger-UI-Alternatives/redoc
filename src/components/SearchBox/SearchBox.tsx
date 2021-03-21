@@ -156,12 +156,12 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   };
 
   render() {
-
     const { activeItemIdx } = this.state;
     const results = this.state.results.map(res => ({
       item: this.props.getItemById(res.meta)!,
       score: res.score,
     }));
+
     //start anthony
     let currId = '';
     let index = 0,count=0;
@@ -170,7 +170,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     
     results.forEach(curr => {
       if(curr !== undefined) {
-
+    
         if(currId === ''){
           currId = curr.item.id;
           aggResults.push(curr); //push first onto results
@@ -187,12 +187,13 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           index++;
           count=1;
         }
-        
+    
       }
     });
-   console.log(aggResults);
-   aggResults.sort((a, b) => b.score - a.score);
-    results.sort((a, b) => b.score - a.score);
+    //  console.log(aggResults);
+    aggResults.sort((a, b) => b.score - a.score);
+
+    // results.sort((a, b) => b.score - a.score);
 
     return (
       <SearchWrap role="search">
@@ -232,7 +233,6 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       </SearchWrap>
     );
   }
-
   compare( a, b ) {
     if ( a.item.id < b.item.id ){
       return -1;
@@ -242,5 +242,4 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     }
     return 0;
   }
-  
 }

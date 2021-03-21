@@ -6,13 +6,10 @@ import {
   OpenAPIParameterStyle,
   Referenced,
 } from '../../types';
-import { IMenuItem } from '../MenuStore'; //EXTENDED SEARCH
 import { RedocNormalizedOptions } from '../RedocNormalizedOptions';
 
 import { extractExtensions } from '../../utils/openapi';
 import { OpenAPIParser } from '../OpenAPIParser';
-import { MediaContentModel } from './MediaContent';  //EXTENDED SEARCH
-import { ResponseModel } from './Response'; //EXTENDED SEARCH
 import { SchemaModel } from './Schema';
 import { ExampleModel } from './Example';
 import { mapValues } from '../../utils/helpers';
@@ -42,29 +39,9 @@ const DEFAULT_SERIALIZATION: Record<
 /**
  * Field or Parameter model ready to be used by components
  */
-export class FieldModel implements IMenuItem {
+export class FieldModel {
   @observable
-  expanded: boolean = false;
-
-  //EXTENDED SEARCH START
-  depth: number;
-  items = [];
-
-  ready?: boolean = true;
-  active: boolean = false;
-
-  id: string;
-  absoluteIdx?: number;
-  parent?: IMenuItem;
-
-  containerContentModel?: MediaContentModel;
-  containerOneOf?: SchemaModel;
-  activeContentModel?: number;
-  activeOneOf?: number;
-  responseContainer?: ResponseModel;
-
-  type = 'field' as 'field';
-  //EXTENDED SEARCH END
+  expanded: boolean | undefined = false;
 
   schema: SchemaModel;
   name: string;
@@ -140,43 +117,4 @@ export class FieldModel implements IMenuItem {
   toggle() {
     this.expanded = !this.expanded;
   }
-
-  //EXTENDED SEARCH START
-  @action
-  activate() {
-    if (this.parent) {
-      this.parent.activate();
-      if (this.responseContainer !== undefined) {
-        this.responseContainer.expand();
-      }
-      if (this.containerContentModel !== undefined && this.activeContentModel !== undefined) {
-        this.containerContentModel.activate(this.activeContentModel);
-      }
-      if (this.containerOneOf !== undefined && this.activeOneOf !== undefined) {
-        this.containerOneOf.activateOneOf(this.activeOneOf);
-      }
-    }
-  }
-
-  @action
-  deactivate() {
-    if (this.parent) {
-      this.parent.deactivate();
-    }
-  }
-
-  @action
-  expand() {
-    if (this.parent) {
-      if (this.parent.type === 'field') {
-        this.parent.expanded = true;
-      }
-      this.parent.expand();
-    }
-  }
-
-  collapse() {
-    // Do nothing
-  }
-  //EXTENDED SEARCH END
 }

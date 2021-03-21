@@ -29,7 +29,9 @@ export interface SearchDocument {
   title: string;
   description: string;
   longDescription: string; //anthony added longdescription
-  fieldModel: string;       // added
+  path: string;
+  query: string;
+  prop: string;
   id: string;
 }
 
@@ -48,15 +50,22 @@ let resolveIndex: (v: lunr.Index) => void;
 
 let index: Promise<lunr.Index>;
 
+// initialize a new builder
 function initEmpty() {
   builder = new lunr.Builder();
-  builder.field('title'), { boost: 10 };
+  builder.field('title', { boost: 10 });
   builder.field('description');
-  builder.field('longDescription'); 
+  builder.field('longDescription'); //anthony added longdescription
+  builder.field('path');
+  builder.field('query');
+  builder.field('req');
+  builder.field('resp');
   builder.ref('ref');
 
   builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
 
+  // index is our lunr.Index. It is wrapped in a Promise object because it is an asynchronous function and we wanna wait for
+  // the search to complete before continuing execution. i.e. trying to access the SearchResults
   index = new Promise(resolve => {
     resolveIndex = resolve;
   });
@@ -64,18 +73,23 @@ function initEmpty() {
 
 initEmpty();
 
-const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*'; 
+// const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
+// const expandTerm = term => '*' + new lunr.Token(term, {}) + '*';
 
-export function add<T>(title: string, description: string, longDescription: string, meta?: T) { 
+
+export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, req: string, resp: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), ref }; 
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), req: req.toLowerCase(), resp: resp.toLowerCase(), ref }; //anthony added longdescription
+  console.log("adding item in SearchWorker.worker");
+  console.log(item); //anthony
+
   builder.add(item);
 }
 
 export async function done() {
   resolveIndex(builder.build());
 }
-
+// serialize lunr index for faster client-side loading. Good for large, static websites
 export async function toJS() {
   return {
     store,
@@ -96,7 +110,7 @@ export async function fromExternalJS(path: string, exportName: string) {
     console.error('Failed to load search index: ' + e.message);
   }
 }
-
+// load the serialized index. much faster than building it from scratch
 export async function load(state: any) {
   store = state.store;
   resolveIndex(lunr.Index.load(state.index));
@@ -113,16 +127,26 @@ export async function search<Meta = string>(
 ): Promise<Array<SearchResult<Meta>>> {
   if (q.trim().length === 0) {
     return [];
-  }
-  let searchResults = (await index).query(t => {
-    q.trim()
-      .toLowerCase()
-      .split(/\s+/)
-      .forEach(term => {
-        if (term.length === 1) return;
-        const exp = expandTerm(term);
-        t.term(exp, {});
-      });
+  } // a query object is given to the Index.query() function which should be used to express the query to be run against the index
+  let searchResults = (await index).query(queryObject => {
+    // q.trim()
+    //   .toLowerCase()
+    //   .split(/\s+/) // splits spaces
+    //   .forEach(term => {
+    //     console.log("term");
+    //     console.log(term);
+    //     if (term.length === 1) return;
+    //     const exp = expandTerm(term);
+    //     console.log("exp");
+    //     console.log(exp);
+    //     queryObject.term(exp, {});
+
+        queryObject.term(lunr.stemmer(new lunr.Token(q, {})), {
+          fields: ['resp'],
+          boost: 10,
+          wildcard: lunr.Query.wildcard.TRAILING
+        });
+      // });
   });
 
   if (limit > 0) {

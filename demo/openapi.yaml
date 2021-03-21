@@ -2925,7 +2925,7 @@ paths:
       description: Retrieves historical performance metrics for a volume.
       operationId: volume_metrics_collection_get
       parameters:
-        - x-ntap-autogen-params: volume_metrics
+        # - x-ntap-autogen-params: volume_metrics
         - $ref: '#/parameters/return_timeout_get_param'
         - $ref: '#/parameters/fields_param'
         - $ref: '#/parameters/max_records_param'
