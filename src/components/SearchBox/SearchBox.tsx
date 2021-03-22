@@ -187,7 +187,6 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           index++;
           count=1;
         }
-    
       }
     });
     //  console.log(aggResults);

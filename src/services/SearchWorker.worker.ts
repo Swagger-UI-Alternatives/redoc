@@ -31,7 +31,9 @@ export interface SearchDocument {
   longDescription: string; //anthony added longdescription
   path: string;
   query: string;
-  prop: string;
+  req: string;
+  resp: string;
+  verb: string;
   id: string;
 }
 
@@ -60,6 +62,7 @@ function initEmpty() {
   builder.field('query');
   builder.field('req');
   builder.field('resp');
+  builder.field('verb');
   builder.ref('ref');
 
   builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
@@ -73,15 +76,13 @@ function initEmpty() {
 
 initEmpty();
 
-// const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
-// const expandTerm = term => '*' + new lunr.Token(term, {}) + '*';
+const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
 
-
-export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, req: string, resp: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, req: string, resp: string, verb: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), req: req.toLowerCase(), resp: resp.toLowerCase(), ref }; //anthony added longdescription
-  console.log("adding item in SearchWorker.worker");
-  console.log(item); //anthony
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), req: req.toLowerCase(), resp: resp.toLowerCase(), verb: verb.toLowerCase(), ref }; //anthony added longdescription
+  // console.log("adding item in SearchWorker.worker");
+  // console.log(item); //anthony
 
   builder.add(item);
 }
@@ -120,6 +121,83 @@ export async function dispose() {
   store = [];
   initEmpty();
 }
+/*
+const paragraph = 'The quick brown fox jumps over the lazy dog. It barked.';
+const regex = /[A-Z]/g;
+const found = paragraph.match(regex);
+// expected output: Array ["T", "I"]
+*/
+// regexr
+// const regex = /(TITLE|PATH|QUERY|REQ|RESP)\[(\w+)\]*/g;
+const regex = /(TITLE|PATH|QUERY|REQ|RESP)\[(.+?)\]/g;
+// ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
+
+export async function search<Meta = string>(
+  q: string,
+  limit = 0,
+): Promise<Array<SearchResult<Meta>>> {
+  if (q.trim().length === 0) {
+    return [];
+  } // a query object is given to the Index.query() function which should be used to express the query to be run against the index
+  let searchResults = (await index).query(queryObject => {
+    q.trim();
+
+    // let input = q.match(regex);
+    // console.log("q.match(regex)");
+    // console.log(input);
+    // input = regex.exec(q);
+    // console.log("regex.exec(q)");
+    // console.log(input);
+
+    const arrInput: Array<RegExpMatchArray> = [];
+    let i: any;
+    while((i = regex.exec(q)) !== null) {
+      arrInput.push(i);
+    }
+    console.log("while loop results");
+    console.log(arrInput);
+    /*
+    ok so first grab all the FIELDS and their keys
+    then
+    */
+    const fieldsArray: string[] = [];
+    const searchItems: string[] = [];
+    // arrInput.forEach(searchTerm => {
+    //     fieldsArray.push(searchTerm[1].toLowerCase());
+    //     searchItems.push(searchTerm[2].toLowerCase());
+    // });
+
+    arrInput.forEach(searchTerm => {
+      fieldsArray.push(searchTerm[1].toLowerCase());
+      //split searchTerm items into separate tokens and pass into searchItems array individually
+      searchTerm[2].trim().toLowerCase().split(/\s+/).forEach(item => {
+        searchItems.push(item);
+      })
+    });
+
+    console.log("fields then search");
+    console.log(fieldsArray);
+    console.log(searchItems);
+
+    // for each term that we find 
+    searchItems.forEach(term => {
+      if(term.length === 1) return;
+      const exp = expandTerm(term);
+      queryObject.term(exp, {
+        fields: fieldsArray
+      });
+    })
+  });
+
+  if (limit > 0) {
+    searchResults = searchResults.slice(0, limit);
+  }
+  //console.log(searchResults); //anthony
+  return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
+}
+
+
+/*
 
 export async function search<Meta = string>(
   q: string,
@@ -131,21 +209,44 @@ export async function search<Meta = string>(
   let searchResults = (await index).query(queryObject => {
     // q.trim()
     //   .toLowerCase()
-    //   .split(/\s+/) // splits spaces
+    //   .split(/\s+/) // splits on spaces
     //   .forEach(term => {
-    //     console.log("term");
-    //     console.log(term);
     //     if (term.length === 1) return;
     //     const exp = expandTerm(term);
-    //     console.log("exp");
-    //     console.log(exp);
     //     queryObject.term(exp, {});
+    q.trim();
 
-        queryObject.term(lunr.stemmer(new lunr.Token(q, {})), {
-          fields: ['resp'],
-          boost: 10,
-          wildcard: lunr.Query.wildcard.TRAILING
-        });
+    // let input = q.match(regex);
+    // console.log("q.match(regex)");
+    // console.log(input);
+    // input = regex.exec(q);
+    // console.log("regex.exec(q)");
+    // console.log(input);
+
+    const arrInput: Array<RegExpMatchArray> = [];
+    let i: any;
+    while((i = regex.exec(q)) !== null) {
+      arrInput.push(i);
+    }
+    console.log("while loop results");
+    console.log(arrInput);
+
+    const fieldsArray: string[] = [];
+    const searchItems: string[] = [];
+    arrInput.forEach(searchTerm => {
+        fieldsArray.push(searchTerm[1].toLowerCase());
+        searchItems.push(searchTerm[2].toLowerCase());
+    });
+    console.log("fields then search");
+    console.log(fieldsArray);
+    console.log(searchItems);
+    
+    // for each term that we find 
+    queryObject.term(lunr.stemmer(new lunr.Token(q, {})), { // potential search pipeline to more efficiently parse the input
+      fields: fieldsArray,
+      boost: 10,
+      wildcard: lunr.Query.wildcard.TRAILING
+    });
       // });
   });
 
@@ -155,5 +256,4 @@ export async function search<Meta = string>(
   //console.log(searchResults); //anthony
   return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
 }
-
-
+*/

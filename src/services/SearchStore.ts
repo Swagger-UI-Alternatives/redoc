@@ -32,27 +32,27 @@ export class SearchStore<T> {
       items.forEach(group => {
         if(group.type !== 'group') {
           // only operation types have the parameters/responses/etc.
+          let verb = '';
           if(group.type === 'operation') {
+            verb = group.httpVerb;
             console.log("operation "+ group.httpVerb +" group.parameters");
-            console.log(group.parameters);
-            this.addParams(group.parameters, group.name, group.id);
-            this.addRequestBody(group.requestBody, group.id);
-            this.addResponses(group.responses, group.id);
+            this.addParams(group.parameters, group.httpVerb, group.id);
+            this.addRequestBody(group.requestBody, group.httpVerb, group.id);
+            this.addResponses(group.responses, group.httpVerb, group.id);
           }
-          this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', group.id); // anthony added longdescription
+          this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', verb, group.id); // anthony added longdescription
         }
         recurse(group.items);
       });
     };
-
     recurse(groups);
     // once all the documents have been added to the index,
     // calls builder.build() in SearchWorker.worker. to build the index, creating an instance of lunr.Index
     this.searchWorker.done();
   }
 
-  add(title: string, body: string, longDescription: string, path: string, query: string, req: string, resp: string, meta?: T) { //anthony added longdescription
-    this.searchWorker.add(title, body, longDescription, path, query, req, resp, meta);
+  add(title: string, body: string, longDescription: string, path: string, query: string, req: string, resp: string, verb: string, meta?: T) { //anthony added longdescription
+    this.searchWorker.add(title, body, longDescription, path, query, req, resp, verb, meta);
   }
 
   dispose() {
@@ -79,18 +79,18 @@ export class SearchStore<T> {
   }
 
   // function that adds all the parameters to a string to be searched for
-  addParams(parameters: FieldModel[], name: string, id: string) {
+  addParams(parameters: FieldModel[], verb: string, id: string) {
     parameters.forEach(parameter => {
       if(parameter.in === "path") {
-        this.add(name, '', '', parameter.name, '', '', '', id as any);
+        this.add('', '', '', parameter.name, '', '', '', verb, id as any);
       }
       if(parameter.in === "query") {
-        this.add(name, '', '', '', parameter.name, '', '', id as any);
+        this.add('', '', '', '', parameter.name, '', '', verb, id as any);
       }
     });
   }
 
-  addRequestBody(requestBody: RequestBodyModel, id: string) {
+  addRequestBody(requestBody: RequestBodyModel, verb: string, id: string) {
     if(requestBody as RequestBodyModel && requestBody.content) {
       const mediaTypes = requestBody.content.mediaTypes;
       mediaTypes.forEach(mediaType => {
@@ -98,17 +98,17 @@ export class SearchStore<T> {
         const schema = mediaType.schema;
         if(schema && schema.oneOf) {
           schema.oneOf.forEach(s => {
-            this.getFields(s.fields as FieldModel[], id, true);
+            this.getFields(s.fields as FieldModel[], verb, id, true);
           })
         }
         else if(schema && schema.fields) {
-          this.getFields(schema.fields as FieldModel[], id, true);
+          this.getFields(schema.fields as FieldModel[], verb, id, true);
         }
       })
     }
   }
 
-  addResponses(responses: ResponseModel[], id: string) {
+  addResponses(responses: ResponseModel[], verb: string, id: string) {
     responses.forEach(response => {
       if(response.content) {
         const mediaTypes = response.content.mediaTypes;
@@ -117,41 +117,40 @@ export class SearchStore<T> {
           const schema = mediaType.schema;
           if(schema && schema.oneOf) {
             schema.oneOf.forEach(s => {
-              this.getFields(s.fields as FieldModel[], id, false);
+              this.getFields(s.fields as FieldModel[], verb, id, false);
             })
           }
           else if(schema && schema.fields) {
-            this.getFields(schema.fields as FieldModel[], id, false);
+            this.getFields(schema.fields as FieldModel[], verb, id, false);
           }
         })
       }
     })
   }
 
-  getFields(fields: FieldModel[], id: string, isReq: boolean) {
+  getFields(fields: FieldModel[], verb: string, id: string, isReq: boolean) {
     fields.forEach(field => {
-      this.getDeepFields(field, id, isReq);
-      // should i add here as well? we'll see
+      this.getDeepFields(field, verb, id, isReq);
     })
   }
 
-  getDeepFields(field: FieldModel, id: string, isReq: boolean) {
+  getDeepFields(field: FieldModel, verb: string, id: string, isReq: boolean) {
     if(field.schema.fields !== undefined) {
       field.schema.fields.forEach(f => {
-        this.getDeepFields(f, id, isReq);
+        this.getDeepFields(f, verb, id, isReq);
       })
     }
     if(field.schema.items !== undefined && field.schema.items.fields !== undefined) {
       field.schema.items.fields.forEach(f => {
-        this.getDeepFields(f, id, isReq);
+        this.getDeepFields(f, verb, id, isReq);
       });
     }
     if(field.name !== undefined) {
       if(isReq) {
-        this.add('', '', '', '', '', field.name, '', id as any);
+        this.add('', '', '', '', '', field.name, '', verb, id as any);
       }
       else {
-        this.add('', '', '', '', '', '', field.name, id as any);
+        this.add('', '', '', '', '', '', field.name, verb, id as any);
       }
     }
   }
