@@ -32,15 +32,14 @@ export class SearchStore<T> {
       items.forEach(group => {
         if(group.type !== 'group') {
           // only operation types have the parameters/responses/etc.
-          let verb = '';
+          let endpoint = '';
           if(group.type === 'operation') {
-            verb = group.httpVerb;
-            console.log("operation "+ group.httpVerb +" group.parameters");
+            endpoint = group.httpVerb;
             this.addParams(group.parameters, group.httpVerb, group.id);
             this.addRequestBody(group.requestBody, group.httpVerb, group.id);
             this.addResponses(group.responses, group.httpVerb, group.id);
           }
-          this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', verb, group.id); // anthony added longdescription
+          this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', endpoint, group.id); // anthony added longdescription
         }
         recurse(group.items);
       });
@@ -51,8 +50,8 @@ export class SearchStore<T> {
     this.searchWorker.done();
   }
 
-  add(title: string, body: string, longDescription: string, path: string, query: string, req: string, resp: string, verb: string, meta?: T) { //anthony added longdescription
-    this.searchWorker.add(title, body, longDescription, path, query, req, resp, verb, meta);
+  add(title: string, body: string, longDescription: string, path: string, query: string, object: string, property: string, endpoint: string, meta?: T) { //anthony added longdescription
+    this.searchWorker.add(title, body, longDescription, path, query, object, property, endpoint, meta);
   }
 
   dispose() {
@@ -79,79 +78,104 @@ export class SearchStore<T> {
   }
 
   // function that adds all the parameters to a string to be searched for
-  addParams(parameters: FieldModel[], verb: string, id: string) {
+  addParams(parameters: FieldModel[], endpoint: string, id: string) {
     parameters.forEach(parameter => {
       if(parameter.in === "path") {
-        this.add('', '', '', parameter.name, '', '', '', verb, id as any);
+        this.add('', '', '', parameter.name, '', '', '', endpoint, id as any);
       }
       if(parameter.in === "query") {
-        this.add('', '', '', '', parameter.name, '', '', verb, id as any);
+        this.add('', '', '', '', parameter.name, '', '', endpoint, id as any);
       }
     });
   }
 
-  addRequestBody(requestBody: RequestBodyModel, verb: string, id: string) {
+  addRequestBody(requestBody: RequestBodyModel, endpoint: string, id: string) {
     if(requestBody as RequestBodyModel && requestBody.content) {
       const mediaTypes = requestBody.content.mediaTypes;
       mediaTypes.forEach(mediaType => {
-        // const type = mediaType.name.split('/')[1];
         const schema = mediaType.schema;
         if(schema && schema.oneOf) {
           schema.oneOf.forEach(s => {
-            this.getFields(s.fields as FieldModel[], verb, id, true);
+            this.getFields(s.fields as FieldModel[], endpoint, id, true);
           })
         }
         else if(schema && schema.fields) {
-          this.getFields(schema.fields as FieldModel[], verb, id, true);
+          this.getFields(schema.fields as FieldModel[], endpoint, id, true);
         }
       })
     }
   }
 
-  addResponses(responses: ResponseModel[], verb: string, id: string) {
+  addResponses(responses: ResponseModel[], endpoint: string, id: string) {
     responses.forEach(response => {
       if(response.content) {
         const mediaTypes = response.content.mediaTypes;
         mediaTypes.forEach(mediaType => {
-          // const type = mediaType.name.split('/')[1];
           const schema = mediaType.schema;
           if(schema && schema.oneOf) {
             schema.oneOf.forEach(s => {
-              this.getFields(s.fields as FieldModel[], verb, id, false);
+              this.getFields(s.fields as FieldModel[], endpoint, id, false);
             })
           }
           else if(schema && schema.fields) {
-            this.getFields(schema.fields as FieldModel[], verb, id, false);
+            this.getFields(schema.fields as FieldModel[], endpoint, id, false);
           }
         })
       }
     })
   }
 
-  getFields(fields: FieldModel[], verb: string, id: string, isReq: boolean) {
+  getFields(fields: FieldModel[], endpoint: string, id: string, isReq: boolean) {
+    // for each ['_links','num_records','records']
     fields.forEach(field => {
-      this.getDeepFields(field, verb, id, isReq);
+      this.getDeepFields(field, endpoint, id, isReq);
     })
   }
 
-  getDeepFields(field: FieldModel, verb: string, id: string, isReq: boolean) {
+  getDeepFields(field: FieldModel, endpoint: string, id: string, isReq: boolean) {
+    // if a field has a schema with other fields
+    // false - 'num_records' has a schema but it doesn't have fields
     if(field.schema.fields !== undefined) {
       field.schema.fields.forEach(f => {
-        this.getDeepFields(f, verb, id, isReq);
+        this.getDeepFields(f, endpoint, id, isReq);
       })
+      // if(isReq) {
+      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      // }
+      // else {
+      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      // }
+      this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+
+      return;
     }
+    // if a field's schema doesn't have fields but the field's schema does have items in it
+    // does 'num_records' execute this? No
     if(field.schema.items !== undefined && field.schema.items.fields !== undefined) {
       field.schema.items.fields.forEach(f => {
-        this.getDeepFields(f, verb, id, isReq);
+        this.getDeepFields(f, endpoint, id, isReq);
       });
+      // if(isReq) {
+      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      // }
+      // else {
+      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      // }
+      this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+
+      return;
     }
+    // this is where we would like to add PROPERTY (ies)
+    // add PROPERTY
     if(field.name !== undefined) {
-      if(isReq) {
-        this.add('', '', '', '', '', field.name, '', verb, id as any);
-      }
-      else {
-        this.add('', '', '', '', '', '', field.name, verb, id as any);
-      }
+      // if(isReq) {
+      //   this.add('', '', '', '', '', '', field.name, endpoint, id as any);
+      // }
+      // else {
+      //   this.add('', '', '', '', '', '', field.name, endpoint, id as any);
+      // }
+      this.add('', '', '', '', '', '', field.name, endpoint, id as any);
+
     }
   }
 
