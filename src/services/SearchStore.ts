@@ -34,27 +34,24 @@ export class SearchStore<T> {
           // only operation types have the parameters/responses/etc.
           let endpoint = '';
           if(group.type === 'operation') {
-            //console.log("operation "+ group.httpVerb +" group.parameters");
-            //console.log(group.parameters);
             endpoint = group.httpVerb;
             this.addParams(group.parameters, group.httpVerb, group.id);
             this.addRequestBody(group.requestBody, group.httpVerb, group.id);
-            this.addResponses(group.responses,group.httpVerb, group.id);
+            this.addResponses(group.responses, group.httpVerb, group.id);
           }
           this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', endpoint, group.id); // anthony added longdescription
         }
         recurse(group.items);
       });
     };
-
     recurse(groups);
     // once all the documents have been added to the index,
     // calls builder.build() in SearchWorker.worker. to build the index, creating an instance of lunr.Index
     this.searchWorker.done();
   }
 
-  add(title: string, body: string, longDescription: string, path: string, query: string, req: string, resp: string, endpoint: string, meta?: T) { //anthony added longdescription
-    this.searchWorker.add(title, body, longDescription, path, query, req, resp, endpoint, meta);
+  add(title: string, body: string, longDescription: string, path: string, query: string, object: string, property: string, endpoint: string, meta?: T) { //anthony added longdescription
+    this.searchWorker.add(title, body, longDescription, path, query, object, property, endpoint, meta);
   }
 
   dispose() {
@@ -96,7 +93,6 @@ export class SearchStore<T> {
     if(requestBody as RequestBodyModel && requestBody.content) {
       const mediaTypes = requestBody.content.mediaTypes;
       mediaTypes.forEach(mediaType => {
-        // const type = mediaType.name.split('/')[1];
         const schema = mediaType.schema;
         if(schema && schema.oneOf) {
           schema.oneOf.forEach(s => {
@@ -115,7 +111,6 @@ export class SearchStore<T> {
       if(response.content) {
         const mediaTypes = response.content.mediaTypes;
         mediaTypes.forEach(mediaType => {
-          // const type = mediaType.name.split('/')[1];
           const schema = mediaType.schema;
           if(schema && schema.oneOf) {
             schema.oneOf.forEach(s => {
@@ -133,33 +128,33 @@ export class SearchStore<T> {
   getFields(fields: FieldModel[], endpoint: string, id: string, isReq: boolean) {
     fields.forEach(field => {
       this.getDeepFields(field, endpoint, id, isReq);
-      // should i add here as well? we'll see
     })
   }
 
   getDeepFields(field: FieldModel, endpoint: string, id: string, isReq: boolean) {
+    // if a field has a schema with other fields
     if(field.schema.fields !== undefined) {
       field.schema.fields.forEach(f => {
         this.getDeepFields(f, endpoint, id, isReq);
       })
+      this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      return;
     }
+    // if a field's schema doesn't have fields but the field's schema does have items in it
     if(field.schema.items !== undefined && field.schema.items.fields !== undefined) {
       field.schema.items.fields.forEach(f => {
         this.getDeepFields(f, endpoint, id, isReq);
       });
+      this.add('', '', '', '', '', field.name, '', endpoint, id as any);
+      return;
     }
+    // this is where we would like to add properties
     if(field.name !== undefined) {
-      if(isReq) {
-        this.add('', '', '', '', '', field.name, '',endpoint, id as any);
-      }
-      else {
-        this.add('', '', '', '', '', '', field.name, endpoint, id as any);
-      }
+      this.add('', '', '', '', '', '', field.name, endpoint, id as any);
     }
   }
 
   /*
-
   static getFields(fields, parent, section, depth): FieldModel[] {
     const temp: FieldModel[] = [];
     fields.forEach(field => {

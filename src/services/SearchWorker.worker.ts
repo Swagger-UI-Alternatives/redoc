@@ -31,7 +31,8 @@ export interface SearchDocument {
   longDescription: string; //anthony added longdescription
   path: string;
   query: string;
-  prop: string;
+  object: string;
+  property: string;
   endpoint: string;
   id: string;
 }
@@ -183,8 +184,8 @@ function initEmpty() {
   builder.field('longDescription'); //anthony added longdescription
   builder.field('path');
   builder.field('query');
-  builder.field('req');
-  builder.field('resp');
+  builder.field('object');
+  builder.field('property');
   builder.field('endpoint');
   builder.ref('ref');
   
@@ -202,16 +203,13 @@ function initEmpty() {
 
 initEmpty();
 
- const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
-// const expandTerm = term => '*' + new lunr.Token(term, {}) + '*';
+const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
 
-
-export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, req: string, resp: string,endpoint: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, object: string, property: string, endpoint: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), req: req.toLowerCase(), resp: resp.toLowerCase(),endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
-  //console.log("adding item in SearchWorker.worker");
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), object: object.toLowerCase(), property: property.toLowerCase(), endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
+  console.log("adding item in SearchWorker.worker");
   console.log(item); //anthony
-
   builder.add(item);
 }
 
@@ -249,7 +247,92 @@ export async function dispose() {
   store = [];
   initEmpty();
 }
+// regexr
+// const regex = /(TITLE|PATH|QUERY|REQ|RESP)\[(\w+)\]*/g;
 
+//const regex = /(TITLE|PATH|QUERY|OBJECT|PROPERTY)\[(.+?)\]/g;
+// ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
+
+export async function search<Meta = string>(
+  q: string,
+  limit = 0,
+): Promise<Array<SearchResult<Meta>>> {
+  if (q.trim().length === 0) {
+    return [];
+  } // a query object is given to the Index.query() function which should be used to express the query to be run against the index
+  let searchResults = (await index).query(queryObject => {
+    q.trim();
+
+    const arrInput: Array<RegExpMatchArray> = [];
+    let i: any;
+    while((i = regex.exec(q)) !== null) {
+      arrInput.push(i);
+    }
+    console.log("while loop results");
+    console.log(arrInput);
+
+    const fieldsArray: string[] = [];
+    const searchItems: string[] = [];
+
+    arrInput.forEach(searchTerm => {
+      if(searchTerm[1] !== undefined) {
+        searchTerm[1].trim().toLowerCase().split(/\s+/).forEach(item => {
+          fieldsArray.push('endpoint');
+          searchItems.push(item);
+        })
+      }
+      if(searchTerm[2] !== undefined) {
+        fieldsArray.push(searchTerm[2].toLowerCase());
+      }
+        //split searchTerm items into separate tokens and pass into searchItems array individually
+        if(searchTerm[3] !== undefined) {
+        searchTerm[3].trim().toLowerCase().split(/\s+/).forEach(item => {
+          searchItems.push(item);
+        });
+      }
+        
+    }); 
+
+    console.log("fields then search");
+    console.log(fieldsArray);
+    console.log(searchItems);
+    console.log("fields length");
+    console.log(fieldsArray.length);
+
+    if(searchItems.length === 0) {
+      if(q.length === 1) return;
+      q.toLowerCase()
+        .split(/\s+/) // splits on spaces
+        .forEach(term => {
+          if (term.length === 1) return;
+          const exp = expandTerm(term);
+          queryObject.term(exp, {
+            fields: ['title','description','longDescription']
+          });
+      })
+    }
+    else {
+      
+    }
+    // for each term that we find 
+    let count = 0;
+    searchItems.forEach(term => {
+      if(term.length === 1) return;
+      const exp = expandTerm(term);
+      // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
+      queryObject.term(exp, {fields: [fieldsArray[count]] });
+      count++;
+    })
+  });
+
+  if (limit > 0) {
+    searchResults = searchResults.slice(0, limit);
+  }
+  return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
+}
+
+
+/*
 export async function search<Meta = string>(
   q: string,
   limit = 0,
@@ -310,20 +393,11 @@ export async function search<Meta = string>(
       queryObject.term(exp, {fields: [fieldsArray[count]]});
       count++;
     }); 
-        /*//queryObject.term(lunr.stemmer(new lunr.Token(q, {})), {
+        /* //queryObject.term(lunr.stemmer(new lunr.Token(q, {})), {
           queryObject.term(searchItems, {
           fields: fieldsArray,
           boost: 10,
           wildcard: lunr.Query.wildcard.TRAILING,
         });*/
       // });
-  });
-
-  if (limit > 0) {
-    searchResults = searchResults.slice(0, limit);
-  }
-  //console.log(searchResults); //anthony
-  return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
-}
-
-
+  //});
