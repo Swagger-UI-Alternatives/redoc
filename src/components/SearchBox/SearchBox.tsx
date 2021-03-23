@@ -167,7 +167,8 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     let index = 0,count=0;
     const aggResults: Aggregate[] = []; 
     results.sort(this.compare);
-    
+    //console.log('results');
+    //console.log(results);
     results.forEach(curr => {
       if(curr !== undefined) {
     
@@ -192,6 +193,8 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     });
     //  console.log(aggResults);
     aggResults.sort((a, b) => b.score - a.score);
+    //console.log('aggresults');
+    //console.log(aggResults);
 
     // results.sort((a, b) => b.score - a.score);
 
