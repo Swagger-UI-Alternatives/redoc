@@ -46,7 +46,7 @@ let store: any[] = [];
 
 lunr.tokenizer.separator = /\s+/;
 
-const regex = /(POST|GET|PATCH|DELETE)|(TITLE|PATH|QUERY|REQ|RESP)\[(.+?)\]/g;
+const regex = /(POST|GET|PATCH|DELETE)|(TITLE|PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
 //let regexp2: RegExp = /\[\w+\]+/g;
 
 let builder: lunr.Builder;
