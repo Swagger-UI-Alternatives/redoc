@@ -136,13 +136,6 @@ export async function search<Meta = string>(
   let searchResults = (await index).query(queryObject => {
     q.trim();
 
-    // let input = q.match(regex);
-    // console.log("q.match(regex)");
-    // console.log(input);
-    // input = regex.exec(q);
-    // console.log("regex.exec(q)");
-    // console.log(input);
-
     const arrInput: Array<RegExpMatchArray> = [];
     let i: any;
     while((i = regex.exec(q)) !== null) {
@@ -165,11 +158,29 @@ export async function search<Meta = string>(
     console.log("fields then search");
     console.log(fieldsArray);
     console.log(searchItems);
+    console.log("fields length");
+    console.log(fieldsArray.length);
 
+    if(searchItems.length === 0) {
+      if(q.length === 1) return;
+      q.toLowerCase()
+        .split(/\s+/) // splits on spaces
+        .forEach(term => {
+          if (term.length === 1) return;
+          const exp = expandTerm(term);
+          queryObject.term(exp, {
+            fields: ['title','description','longDescription']
+          });
+      })
+    }
+    else {
+      
+    }
     // for each term that we find 
     searchItems.forEach(term => {
       if(term.length === 1) return;
       const exp = expandTerm(term);
+      // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
       queryObject.term(exp, {
         fields: fieldsArray
       });

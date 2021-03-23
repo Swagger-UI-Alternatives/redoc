@@ -126,7 +126,6 @@ export class SearchStore<T> {
   }
 
   getFields(fields: FieldModel[], endpoint: string, id: string, isReq: boolean) {
-    // for each ['_links','num_records','records']
     fields.forEach(field => {
       this.getDeepFields(field, endpoint, id, isReq);
     })
@@ -134,53 +133,28 @@ export class SearchStore<T> {
 
   getDeepFields(field: FieldModel, endpoint: string, id: string, isReq: boolean) {
     // if a field has a schema with other fields
-    // false - 'num_records' has a schema but it doesn't have fields
     if(field.schema.fields !== undefined) {
       field.schema.fields.forEach(f => {
         this.getDeepFields(f, endpoint, id, isReq);
       })
-      // if(isReq) {
-      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-      // }
-      // else {
-      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-      // }
       this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-
       return;
     }
     // if a field's schema doesn't have fields but the field's schema does have items in it
-    // does 'num_records' execute this? No
     if(field.schema.items !== undefined && field.schema.items.fields !== undefined) {
       field.schema.items.fields.forEach(f => {
         this.getDeepFields(f, endpoint, id, isReq);
       });
-      // if(isReq) {
-      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-      // }
-      // else {
-      //   this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-      // }
       this.add('', '', '', '', '', field.name, '', endpoint, id as any);
-
       return;
     }
-    // this is where we would like to add PROPERTY (ies)
-    // add PROPERTY
+    // this is where we would like to add properties
     if(field.name !== undefined) {
-      // if(isReq) {
-      //   this.add('', '', '', '', '', '', field.name, endpoint, id as any);
-      // }
-      // else {
-      //   this.add('', '', '', '', '', '', field.name, endpoint, id as any);
-      // }
       this.add('', '', '', '', '', '', field.name, endpoint, id as any);
-
     }
   }
 
   /*
-
   static getFields(fields, parent, section, depth): FieldModel[] {
     const temp: FieldModel[] = [];
     fields.forEach(field => {
