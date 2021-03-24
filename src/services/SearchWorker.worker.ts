@@ -33,6 +33,7 @@ export interface SearchDocument {
   query: string;
   object: string;
   property: string;
+  verb: string;
   endpoint: string;
   id: string;
 }
@@ -183,6 +184,7 @@ function initEmpty() {
   builder.field('query');
   builder.field('object');
   builder.field('property');
+  builder.field('verb');
   builder.field('endpoint');
   builder.ref('ref');
   
@@ -203,9 +205,9 @@ initEmpty();
 
 const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
 
-export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, object: string, property: string, endpoint: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, object: string, property: string, verb: string, endpoint: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), object: object.toLowerCase(), property: property.toLowerCase(), endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), object: object.toLowerCase(), property: property.toLowerCase(), verb: verb.toLowerCase(), endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
   // console.log("adding item in SearchWorker.worker");
   // console.log(item); //anthony
   builder.add(item);
@@ -251,7 +253,7 @@ export async function dispose() {
 //const regex = /(TITLE|PATH|QUERY|OBJECT|PROPERTY)\[(.+?)\]/g;
 // ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
 
-const regex = /(POST|GET|PATCH|DELETE)|(TITLE|PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
+const regex = /(POST|GET|PATCH|DELETE)|([a-z\/\.\-\{\}]+)|(TITLE|PATH|QUERY|PROPERTY|OBJECT|ENDPOINT)\[(.+?)\]/g;
 
 export async function search<Meta = string>(
   q: string,
@@ -271,9 +273,10 @@ export async function search<Meta = string>(
     console.log("while loop results");
     console.log(arrInput);
 
+    const verbFilter: string[] = [];
+    const endpointFilter: string[] = [];
     const fieldsArray: string[] = [];
     const searchItems: Array<string[]> = [];
-    const verbFilter: string[] = [];
 
     const verbLookup = {
       get: true,
@@ -331,12 +334,15 @@ export async function search<Meta = string>(
         })
       }
       if(searchTerm[2] !== undefined) {
-        fieldsArray.push(searchTerm[2].toLowerCase());
+        endpointFilter.push(searchTerm[2]);
+      }
+      if(searchTerm[3] !== undefined) {
+        fieldsArray.push(searchTerm[3].toLowerCase());
       }
       //split searchTerm items into separate tokens and pass into searchItems array individually
-      if(searchTerm[3] !== undefined) {
+      if(searchTerm[4] !== undefined) {
         const arr: string[] = [];
-        searchTerm[3].trim().toLowerCase().split(/\s+/).forEach(item => {
+        searchTerm[4].trim().toLowerCase().split(/\s+/).forEach(item => {
           arr.push(expandTerm(item));
         });
         searchItems.push(arr);
@@ -352,6 +358,7 @@ export async function search<Meta = string>(
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
     if(fieldsArray.length === 0 && verbFilter.length === 0) {
+      console.log("case 1");
       if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -363,10 +370,11 @@ export async function search<Meta = string>(
           });
       })
     }
-
+    // if there are no fields being search but there is at least one verb filter
     if(fieldsArray.length === 0 && verbFilter.length > 0) {
+      console.log("case 2");
       queryObject.term(prohibitedVerbs(), {
-        fields: ['endpoint'],
+        fields: ['verb'],
         presence: lunr.Query.presence.PROHIBITED
       });
       queryObject.term(['/'], {
@@ -374,13 +382,13 @@ export async function search<Meta = string>(
         wildcard: lunr.Query.wildcard.TRAILING
       });
     }
-
+    // if there is at least one KEYWORD[searchTerm(s)]
     if(fieldsArray.length > 0 && searchItems.length > 0) {
-      console.log("in here");
+      console.log("case 3");
       // 1. first prohibit any verbs from the search if there are any
       if(verbFilter.length > 0) {
         queryObject.term(prohibitedVerbs(), {
-          fields: ['endpoint'],
+          fields: ['verb'],
           presence: lunr.Query.presence.PROHIBITED
         });
       }
@@ -410,47 +418,9 @@ export async function search<Meta = string>(
         }
 
         count++;
+
       })
-
-      // for each term that we find
-      // let count = 0;
-      // searchItems.forEach(term => {
-      //   console.log("term");
-      //   console.log(term);
-
-      //   if(term.length === 1) return;
-      //   const searchItem = expandTerm(term);
-      //   /* this is wrong we need to change it */
-
-
-
-      //   // if there is endpoint(s)
-      //   if(verbFilter.length > 0) {
-      //     // epFilter is an array of the endpoints
-      //     // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
-      //     verbFilter.forEach(ep => {
-      //       const i = ep;
-      //       verbFilter.indexOf[i] = expandTerm(ep);
-      //     })
-      //     verbFilter.push(searchItem);
-      //     queryObject.term(verbFilter, {
-      //       fields: ['endpoint',fieldsArray[count]],
-      //       presence: lunr.Query.presence.REQUIRED
-      //     });
-      //     verbFilter.pop();
-      //   }
-      //   /* below: this is probably correct but we'll see */
-      //   else {
-      //     queryObject.term(searchItem, {
-      //       fields: [fieldsArray[count]]
-      //     });
-      //   }
-      //   count++;
-      // })
-
-
     }
-
   });
 
   if (limit > 0) {
