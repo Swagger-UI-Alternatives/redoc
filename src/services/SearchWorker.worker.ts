@@ -272,35 +272,86 @@ export async function search<Meta = string>(
     console.log(arrInput);
 
     const fieldsArray: string[] = [];
-    const searchItems: string[] = [];
-    const epFilter: string[] = [];
+    const searchItems: Array<string[]> = [];
+    const verbFilter: string[] = [];
+
+    const verbLookup = {
+      get: true,
+      post: true,
+      patch: true,
+      delete: true,
+      doc: true,
+    }
+
+    function prohibitedCheck(verb: string) {
+      switch(verb) {
+        case 'get':
+          verbLookup.get = false;
+          break;
+        case 'post':
+          verbLookup.post = false;
+          break;
+        case 'patch':
+          verbLookup.patch = false;
+          break;
+        case 'delete':
+          verbLookup.delete = false;
+          break;
+        case 'doc':
+          verbLookup.doc = false;
+      }
+    }
+
+    function prohibitedVerbs() {
+      const arr: string[] = [];
+      if(verbLookup.get) {
+        arr.push(expandTerm('get'));
+      }
+      if(verbLookup.post) {
+        arr.push(expandTerm('post'));
+      }
+      if(verbLookup.patch) {
+        arr.push(expandTerm('patch'));
+      }
+      if(verbLookup.delete) {
+        arr.push(expandTerm('delete'));
+      }
+      if(verbLookup.doc) {
+        arr.push(expandTerm('doc'));
+      }
+      arr.push('');
+      return arr;
+    }
 
     arrInput.forEach(searchTerm => {
       if(searchTerm[1] !== undefined) {
         searchTerm[1].trim().toLowerCase().split(/\s+/).forEach(item => {
-          // fieldsArray.push('endpoint');
-          // searchItems.push(item);
-          epFilter.push(item);
+          prohibitedCheck(item);
+          verbFilter.push(item);
         })
       }
       if(searchTerm[2] !== undefined) {
         fieldsArray.push(searchTerm[2].toLowerCase());
       }
-        //split searchTerm items into separate tokens and pass into searchItems array individually
-        if(searchTerm[3] !== undefined) {
+      //split searchTerm items into separate tokens and pass into searchItems array individually
+      if(searchTerm[3] !== undefined) {
+        const arr: string[] = [];
         searchTerm[3].trim().toLowerCase().split(/\s+/).forEach(item => {
-          searchItems.push(item);
+          arr.push(expandTerm(item));
         });
+        searchItems.push(arr);
       }
     }); 
 
     console.log("endpoints, fields, then search");
-    console.log(epFilter);
+    console.log(verbFilter);
     console.log(fieldsArray);
     console.log(searchItems);
+    console.log("verbLookup");
+    console.log(verbLookup);
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
-    if(searchItems.length === 0 && epFilter.length === 0) {
+    if(fieldsArray.length === 0 && verbFilter.length === 0) {
       if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -312,64 +363,95 @@ export async function search<Meta = string>(
           });
       })
     }
-    // if there's only an endpoint(s) filter
-    if(searchItems.length === 0 && epFilter.length > 0) {
-      /* refactor to not use forEach but to add the entire array to the terms */
-      console.log("this should print");
-      epFilter.forEach(ep => {
-        if(ep.length === 1) return;
-        const exp = expandTerm(ep);
-        queryObject.term([exp,'/'], {               // maybe try to get a '/' as another term and add title to fields list
-          fields: ['endpoint','title'],
-          wildcard: lunr.Query.wildcard.TRAILING,   // so we don't have to search everything w/ endpoint... just the operations
-          presence: lunr.Query.presence.REQUIRED    // now we only search documents with endpoint and a title, i.e. operations
-        })
-      })
+
+    if(fieldsArray.length === 0 && verbFilter.length > 0) {
+      queryObject.term(prohibitedVerbs(), {
+        fields: ['endpoint'],
+        presence: lunr.Query.presence.PROHIBITED
+      });
+      queryObject.term(['/'], {
+        fields: ['title'],
+        wildcard: lunr.Query.wildcard.TRAILING
+      });
     }
 
-    // for each term that we find
-    let count = 0;
-    searchItems.forEach(term => {
-      console.log("term");
-      console.log(term);
-
-      if(term.length === 1) return;
-      const exp = expandTerm(term);
-
-
-
-      /* this is wrong we need to change it */
-      // if there is endpoint(s)
-      if(epFilter.length > 0) {
-        // epFilter is an array of the endpoints
-        // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
-        epFilter.forEach(ep => {
-          const i = ep;
-          epFilter.indexOf[i] = expandTerm(ep);
-        })
-        epFilter.push(exp);
-        queryObject.term(epFilter, {
-          fields: ['endpoint',fieldsArray[count]],
-          presence: lunr.Query.presence.REQUIRED
-        });
-        epFilter.pop();
-      }
-      /* below: this is probably correct but we'll see */
-      else {
-        queryObject.term(exp, {
-        fields: [fieldsArray[count]]
+    if(fieldsArray.length > 0 && searchItems.length > 0) {
+      console.log("in here");
+      // 1. first prohibit any verbs from the search if there are any
+      if(verbFilter.length > 0) {
+        queryObject.term(prohibitedVerbs(), {
+          fields: ['endpoint'],
+          presence: lunr.Query.presence.PROHIBITED
         });
       }
-      count++;
-    })
+      // 2. for each fields KEYWORD
+      let count: number = 0;
+      fieldsArray.forEach(field => {
+        console.log("oh nice!");
+        console.log("searchItems[count]");
+        console.log(searchItems[count]);
+        console.log("fields");
+        console.log(field);
+
+        // if there are multiple search terms for a single field, AND
+        // this doesn't work because i was mixing up verb and endpoint
+        if(searchItems[count].length > 1) {
+          queryObject.term(searchItems[count], {
+            fields: [field],
+            presence: lunr.Query.presence.REQUIRED
+          })
+        }
+
+        // otherwise there is one search term
+        else {
+          queryObject.term(searchItems[count], {
+            fields: [field]
+          })
+        }
+
+        count++;
+      })
+
+      // for each term that we find
+      // let count = 0;
+      // searchItems.forEach(term => {
+      //   console.log("term");
+      //   console.log(term);
+
+      //   if(term.length === 1) return;
+      //   const searchItem = expandTerm(term);
+      //   /* this is wrong we need to change it */
+
+
+
+      //   // if there is endpoint(s)
+      //   if(verbFilter.length > 0) {
+      //     // epFilter is an array of the endpoints
+      //     // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
+      //     verbFilter.forEach(ep => {
+      //       const i = ep;
+      //       verbFilter.indexOf[i] = expandTerm(ep);
+      //     })
+      //     verbFilter.push(searchItem);
+      //     queryObject.term(verbFilter, {
+      //       fields: ['endpoint',fieldsArray[count]],
+      //       presence: lunr.Query.presence.REQUIRED
+      //     });
+      //     verbFilter.pop();
+      //   }
+      //   /* below: this is probably correct but we'll see */
+      //   else {
+      //     queryObject.term(searchItem, {
+      //       fields: [fieldsArray[count]]
+      //     });
+      //   }
+      //   count++;
+      // })
+
+
+    }
+
   });
-
-
-
-
-
-
-
 
   if (limit > 0) {
     searchResults = searchResults.slice(0, limit);
