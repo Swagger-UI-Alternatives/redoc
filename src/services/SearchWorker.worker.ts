@@ -334,7 +334,7 @@ export async function search<Meta = string>(
         })
       }
       if(searchTerm[2] !== undefined) {
-        endpointFilter.push(searchTerm[2]);
+        endpointFilter.push(expandTerm(searchTerm[2]));
       }
       if(searchTerm[3] !== undefined) {
         fieldsArray.push(searchTerm[3].toLowerCase());
@@ -371,7 +371,7 @@ export async function search<Meta = string>(
       })
     }
     // if there are no fields being search but there is at least one verb filter
-    if(fieldsArray.length === 0 && verbFilter.length > 0) {
+    if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
       console.log("case 2");
       queryObject.term(prohibitedVerbs(), {
         fields: ['verb'],
@@ -382,44 +382,43 @@ export async function search<Meta = string>(
         wildcard: lunr.Query.wildcard.TRAILING
       });
     }
+    // if there is at least one verbFilter
+    if(verbFilter.length > 0) {
+      queryObject.term(prohibitedVerbs(), {
+        fields: ['verb'],
+        presence: lunr.Query.presence.PROHIBITED
+      });
+      // if there is at least one endpointFilter
+      if(endpointFilter.length > 0) {
+        endpointFilter.forEach(ep => {
+          queryObject.term(ep, {
+            fields: ['endpoint'],
+            presence: lunr.Query.presence.REQUIRED
+          })
+        });
+      }
+    }
     // if there is at least one KEYWORD[searchTerm(s)]
     if(fieldsArray.length > 0 && searchItems.length > 0) {
       console.log("case 3");
-      // 1. first prohibit any verbs from the search if there are any
-      if(verbFilter.length > 0) {
-        queryObject.term(prohibitedVerbs(), {
-          fields: ['verb'],
-          presence: lunr.Query.presence.PROHIBITED
-        });
-      }
-      // 2. for each fields KEYWORD
       let count: number = 0;
-      fieldsArray.forEach(field => {
-        console.log("oh nice!");
-        console.log("searchItems[count]");
-        console.log(searchItems[count]);
-        console.log("fields");
-        console.log(field);
-
-        // if there are multiple search terms for a single field, AND
-        // this doesn't work because i was mixing up verb and endpoint
-        if(searchItems[count].length > 1) {
-          queryObject.term(searchItems[count], {
-            fields: [field],
-            presence: lunr.Query.presence.REQUIRED
-          })
-        }
-
-        // otherwise there is one search term
-        else {
+      // if there is only 1 fieldsArray we can specify that the presence is required
+      if(fieldsArray.length === 1) {
+        console.log("case 3.1 only one fieldsArray filter");
+        queryObject.term(searchItems[count], {
+          fields: [fieldsArray[count]],
+          presence: lunr.Query.presence.REQUIRED
+        })
+      }
+      else {
+        // for each fields KEYWORD
+        fieldsArray.forEach(field => {
           queryObject.term(searchItems[count], {
             fields: [field]
           })
-        }
-
-        count++;
-
-      })
+          count++;
+        })
+      }
     }
   });
 
