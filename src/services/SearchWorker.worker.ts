@@ -186,7 +186,9 @@ function initEmpty() {
   builder.field('endpoint');
   builder.ref('ref');
   
-  builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
+  // builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
+  builder.pipeline.add(lunr.stopWordFilter, lunr.stemmer);
+
   builder.pipeline.after(lunr.stopWordFilter, myStopWordFilter)
   builder.pipeline.remove(lunr.stopWordFilter)
 
@@ -292,12 +294,13 @@ export async function search<Meta = string>(
       }
     }); 
 
-    console.log("fields then search");
+    console.log("endpoints, fields, then search");
+    console.log(epFilter);
     console.log(fieldsArray);
     console.log(searchItems);
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
-    if(searchItems.length === 0) {
+    if(searchItems.length === 0 && epFilter.length === 0) {
       if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -307,6 +310,20 @@ export async function search<Meta = string>(
           queryObject.term(exp, {
             fields: ['title','description','longDescription']
           });
+      })
+    }
+    // if there's only an endpoint(s) filter
+    if(searchItems.length === 0 && epFilter.length > 0) {
+      /* refactor to not use forEach but to add the entire array to the terms */
+      console.log("this should print");
+      epFilter.forEach(ep => {
+        if(ep.length === 1) return;
+        const exp = expandTerm(ep);
+        queryObject.term([exp,'/'], {               // maybe try to get a '/' as another term and add title to fields list
+          fields: ['endpoint','title'],
+          wildcard: lunr.Query.wildcard.TRAILING,   // so we don't have to search everything w/ endpoint... just the operations
+          presence: lunr.Query.presence.REQUIRED    // now we only search documents with endpoint and a title, i.e. operations
+        })
       })
     }
 
@@ -319,23 +336,80 @@ export async function search<Meta = string>(
       if(term.length === 1) return;
       const exp = expandTerm(term);
 
-      epFilter.forEach(ep => {
-        queryObject.term([ep,exp], {
+
+
+      /* this is wrong we need to change it */
+      // if there is endpoint(s)
+      if(epFilter.length > 0) {
+        // epFilter is an array of the endpoints
+        // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
+        epFilter.forEach(ep => {
+          const i = ep;
+          epFilter.indexOf[i] = expandTerm(ep);
+        })
+        epFilter.push(exp);
+        queryObject.term(epFilter, {
           fields: ['endpoint',fieldsArray[count]],
           presence: lunr.Query.presence.REQUIRED
         });
-      })
-
-      // queryObject.term(exp, {
-      //   fields: fieldsArray,
-      //   presence: lunr.Query.presence.REQUIRED
-      // });
+        epFilter.pop();
+      }
+      /* below: this is probably correct but we'll see */
+      else {
+        queryObject.term(exp, {
+        fields: [fieldsArray[count]]
+        });
+      }
       count++;
     })
   });
 
+
+
+
+
+
+
+
   if (limit > 0) {
     searchResults = searchResults.slice(0, limit);
   }
-  return searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
+  console.log("searchResults");
+  console.log(searchResults);
+  const res = searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
+  console.log("res");
+  console.log(res);
+  return res;
 }
+/*
+let count = 0;
+    searchItems.forEach(term => {
+      console.log("term");
+      console.log(term);
+
+      if(term.length === 1) return;
+      const exp = expandTerm(term);
+
+      // if there is endpoint(s)
+      if(epFilter.length > 0) {
+        // epFilter is an array of the endpoints
+        // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
+        epFilter.forEach(ep => {
+          const i = ep;
+          epFilter.indexOf[i] = expandTerm(ep);
+        })
+        epFilter.push(exp);
+        queryObject.term(epFilter, {
+          fields: ['endpoint',fieldsArray[count]],
+          presence: lunr.Query.presence.REQUIRED
+        });
+        epFilter.pop();
+      }
+      else {
+        queryObject.term(exp, {
+        fields: [fieldsArray[count]]
+        });
+      }
+      count++;
+    })
+*/
