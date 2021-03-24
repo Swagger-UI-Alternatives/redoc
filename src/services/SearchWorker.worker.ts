@@ -288,8 +288,8 @@ export async function search<Meta = string>(
 
     function prohibitedCheck(verb: string) {
       switch(verb) {
-        case 'get':
-          verbLookup.get = false;
+        case 'get': // if the user inputted 'get' then it's 
+          verbLookup.get = false; // not prohibited because that's what the user searched for
           break;
         case 'post':
           verbLookup.post = false;
@@ -304,10 +304,12 @@ export async function search<Meta = string>(
           verbLookup.doc = false;
       }
     }
-
+    // function that is called if at least one verb has been inputted (verbFilter.length > 0)
+    // lists the verbs that are prohibited and they are filtered out
     function prohibitedVerbs() {
-      const arr: string[] = [];
-      if(verbLookup.get) {
+      const arr: string[] = []; // if there's at least one httpVerb in the user input
+      if(verbLookup.get) {  // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
+        // then 'get' is added to the prohibited array list
         arr.push(expandTerm('get'));
       }
       if(verbLookup.post) {
@@ -336,10 +338,11 @@ export async function search<Meta = string>(
       if(searchTerm[2] !== undefined) {
         endpointFilter.push(expandTerm(searchTerm[2]));
       }
+      // keywords
       if(searchTerm[3] !== undefined) {
         fieldsArray.push(searchTerm[3].toLowerCase());
       }
-      //split searchTerm items into separate tokens and pass into searchItems array individually
+      // split searchTerm items into separate tokens and pass into searchItems array individually
       if(searchTerm[4] !== undefined) {
         const arr: string[] = [];
         searchTerm[4].trim().toLowerCase().split(/\s+/).forEach(item => {
@@ -357,6 +360,8 @@ export async function search<Meta = string>(
     console.log(verbLookup);
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
+    // i.e. if there is no httpVerb before then this is performed
+    // default search
     if(fieldsArray.length === 0 && verbFilter.length === 0) {
       console.log("case 1");
       if(q.length === 1) return;
@@ -370,18 +375,24 @@ export async function search<Meta = string>(
           });
       })
     }
-    // if there are no fields being search but there is at least one verb filter
+    // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)
     if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
       console.log("case 2");
+      // first get the verbs from the function that retrieves the verbs assigned prohibited (value = true)
+        // if there's at least one httpVerb in the user input
+        // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
+        // then 'get' is added to the prohibited array list
       queryObject.term(prohibitedVerbs(), {
-        fields: ['verb'],
-        presence: lunr.Query.presence.PROHIBITED
+        fields: ['verb'], // match prohibitedVerbs list of strings against 
+        presence: lunr.Query.presence.PROHIBITED  // filters out things we know we don't want in the results
       });
+      // now we're getting every endpoint
       queryObject.term(['/'], {
-        fields: ['title'],
-        wildcard: lunr.Query.wildcard.TRAILING
+        fields: ['title'],  // we use title here to get any endpoint
+        wildcard: lunr.Query.wildcard.TRAILING  // /anything
       });
     }
+    /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
     // if there is at least one verbFilter
     if(verbFilter.length > 0) {
       queryObject.term(prohibitedVerbs(), {
@@ -398,6 +409,7 @@ export async function search<Meta = string>(
         });
       }
     }
+    // after the verbFilter/endpointFilter(s) happen (or not)
     // if there is at least one KEYWORD[searchTerm(s)]
     if(fieldsArray.length > 0 && searchItems.length > 0) {
       console.log("case 3");
@@ -405,20 +417,30 @@ export async function search<Meta = string>(
       // if there is only 1 fieldsArray we can specify that the presence is required
       if(fieldsArray.length === 1) {
         console.log("case 3.1 only one fieldsArray filter");
-        queryObject.term(searchItems[count], {
-          fields: [fieldsArray[count]],
-          presence: lunr.Query.presence.REQUIRED
-        })
+        // if searchItems[count].length === 1
+        if(searchItems[count].length === 1) {
+          queryObject.term(searchItems[count], {
+            fields: [fieldsArray[count]],
+            presence: lunr.Query.presence.REQUIRED
+          })
+        }
+        else {
+          queryObject.term(searchItems[count], {
+            fields: [fieldsArray[count]],
+          })
+        }
       }
+      // if there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
       else {
         // for each fields KEYWORD
         fieldsArray.forEach(field => {
+          // add the searchItems and match against whatever fields
           queryObject.term(searchItems[count], {
             fields: [field]
           })
-          count++;
         })
       }
+      count++;
     }
   });
 
@@ -432,35 +454,3 @@ export async function search<Meta = string>(
   console.log(res);
   return res;
 }
-/*
-let count = 0;
-    searchItems.forEach(term => {
-      console.log("term");
-      console.log(term);
-
-      if(term.length === 1) return;
-      const exp = expandTerm(term);
-
-      // if there is endpoint(s)
-      if(epFilter.length > 0) {
-        // epFilter is an array of the endpoints
-        // we need to do the expandTerm operation on each endpoint then put that result into the queryObject.term business
-        epFilter.forEach(ep => {
-          const i = ep;
-          epFilter.indexOf[i] = expandTerm(ep);
-        })
-        epFilter.push(exp);
-        queryObject.term(epFilter, {
-          fields: ['endpoint',fieldsArray[count]],
-          presence: lunr.Query.presence.REQUIRED
-        });
-        epFilter.pop();
-      }
-      else {
-        queryObject.term(exp, {
-        fields: [fieldsArray[count]]
-        });
-      }
-      count++;
-    })
-*/

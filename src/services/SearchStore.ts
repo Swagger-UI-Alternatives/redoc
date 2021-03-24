@@ -36,10 +36,10 @@ export class SearchStore<T> {
             this.addParams(group.parameters, group.httpVerb, group.name, group.id);
             this.addRequestBody(group.requestBody, group.httpVerb, group.name, group.id);
             this.addResponses(group.responses, group.httpVerb, group.name, group.id);
-            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', group.httpVerb, group.name, group.id); // anthony added longdescription
+            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', group.httpVerb, group.name, group.id);                         // anthony added longdescription
           }
           else {
-            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', '', '', group.id); // anthony added longdescription
+            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', '', '', group.id);                                             // anthony added longdescription
           }
         }
         recurse(group.items);
@@ -138,6 +138,7 @@ export class SearchStore<T> {
       field.schema.fields.forEach(f => {
         this.getDeepFields(f, verb, endpoint, id);
       })
+      // adds the field's name as an object
       this.add('', '', '', '', '', field.name, '', verb, endpoint, id as any);
       return;
     }
@@ -146,6 +147,7 @@ export class SearchStore<T> {
       field.schema.items.fields.forEach(f => {
         this.getDeepFields(f, verb, endpoint, id);
       });
+      // adds the field's name as an object
       this.add('', '', '', '', '', field.name, '', verb, endpoint, id as any);
       return;
     }
