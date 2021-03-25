@@ -400,6 +400,7 @@ export async function search<Meta = string>(
         presence: lunr.Query.presence.PROHIBITED
       });
       // if there is at least one endpointFilter
+      // NOTE **i think we should only support 1 endpointFilter at the most**
       if(endpointFilter.length > 0) {
         endpointFilter.forEach(ep => {
           queryObject.term(ep, {
@@ -415,32 +416,32 @@ export async function search<Meta = string>(
       console.log("case 3");
       let count: number = 0;
       // if there is only 1 fieldsArray we can specify that the presence is required
-      if(fieldsArray.length === 1) {
-        console.log("case 3.1 only one fieldsArray filter");
-        // if searchItems[count].length === 1
-        if(searchItems[count].length === 1) {
-          queryObject.term(searchItems[count], {
-            fields: [fieldsArray[count]],
-            presence: lunr.Query.presence.REQUIRED
-          })
-        }
-        else {
-          queryObject.term(searchItems[count], {
-            fields: [fieldsArray[count]],
-          })
-        }
+      if(fieldsArray.length === 1 && searchItems[count].length === 1) {
+        console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
+        queryObject.term(searchItems[count], {
+          fields: [fieldsArray[count]],
+          presence: lunr.Query.presence.REQUIRED
+        })
       }
-      // if there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
+      // otherwise, there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
       else {
+        console.log("case 3.2: multiple fieldArrays");
         // for each fields KEYWORD
         fieldsArray.forEach(field => {
+          console.log("field");
+          console.log(field);
           // add the searchItems and match against whatever fields
           queryObject.term(searchItems[count], {
             fields: [field]
           })
+          // queryObject.term('', {
+          //   fields: [field],
+          //   presence: lunr.Query.presence.PROHIBITED
+          // })
+          count++;
         })
       }
-      count++;
+      // count++;
     }
   });
 
