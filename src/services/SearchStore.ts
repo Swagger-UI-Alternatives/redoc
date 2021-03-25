@@ -21,6 +21,11 @@ function getWorker() {
   return new worker();
 }
 
+interface ReturnObj {
+  objects: string[];
+  properties: string[];
+}
+
 export class SearchStore<T> {
   searchWorker = getWorker();
 
@@ -33,13 +38,15 @@ export class SearchStore<T> {
         if(group.type !== 'group') {
           // only operation types have the parameters/responses/etc.
           if(group.type === 'operation') {
-            this.addParams(group.parameters, group.httpVerb, group.name, group.id);
-            this.addRequestBody(group.requestBody, group.httpVerb, group.name, group.id);
-            this.addResponses(group.responses, group.httpVerb, group.name, group.id);
-            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', group.httpVerb, group.name, group.id);                         // anthony added longdescription
+            const params: string[][] = this.addParams(group.parameters);
+            const req: string[][][] = this.addRequestBody(group.requestBody);
+            const resp: string[][][] = this.addResponses(group.responses);
+            const objects = req[0].concat(resp[0]);
+            const properties = req[1].concat(resp[1]);
+            this.add(group.name, group.description || '', group.longDescription || '', params[0], params[1], objects, properties, group.httpVerb, group.name, group.id);                         // anthony added longdescription
           }
           else {
-            this.add(group.name, group.description || '', group.longDescription || '', '', '', '', '', '', '', group.id);                                             // anthony added longdescription
+            this.add(group.name, group.description || '', group.longDescription || '', [''], [''], [['']], [['']], '', '', group.id);                                             // anthony added longdescription
           }
         }
         recurse(group.items);
@@ -51,7 +58,7 @@ export class SearchStore<T> {
     this.searchWorker.done();
   }
 
-  add(title: string, body: string, longDescription: string, path: string, query: string, object: string, property: string, verb: string, endpoint: string, meta?: T) { //anthony added longdescription
+  add(title: string, body: string, longDescription: string, path: string[], query: string[], object: string[][], property: string[][], verb: string, endpoint: string, meta?: T) { //anthony added longdescription
     this.searchWorker.add(title, body, longDescription, path, query, object, property, verb, endpoint, meta);
   }
 
@@ -79,35 +86,57 @@ export class SearchStore<T> {
   }
 
   // function that adds all the parameters to a string to be searched for
-  addParams(parameters: FieldModel[], verb: string, endpoint: string, id: string) {
+  addParams(parameters: FieldModel[]): string[][] {
+    const paths: string[] = [];
+    const queries: string[] = [];
     parameters.forEach(parameter => {
       if(parameter.in === "path") {
-        this.add('', '', '', parameter.name, '', '', '', verb, endpoint, id as any);
+        paths.push(parameter.name);
       }
       if(parameter.in === "query") {
-        this.add('', '', '', '', parameter.name, '', '', verb, endpoint, id as any);
+        queries.push(parameter.name);
       }
     });
+    return [paths, queries];
   }
 
-  addRequestBody(requestBody: RequestBodyModel, verb: string, endpoint: string, id: string) {
+  addRequestBody(requestBody: RequestBodyModel): string[][][] {
+    console.log("addRequestBody");
+    const objects: string[][] = [];
+    const properties: string[][] = [];
     if(requestBody as RequestBodyModel && requestBody.content) {
       const mediaTypes = requestBody.content.mediaTypes;
       mediaTypes.forEach(mediaType => {
         const schema = mediaType.schema;
         if(schema && schema.oneOf) {
           schema.oneOf.forEach(s => {
-            this.getFields(s.fields as FieldModel[], verb, endpoint, id);
+            const temp = this.getFields(s.fields as FieldModel[]);
+            if(temp[0] !== undefined) {
+              objects.push(temp[0]);
+            }
+            if(temp[1] !== undefined) {
+              properties.push(temp[1]);
+            }
           })
         }
         else if(schema && schema.fields) {
-          this.getFields(schema.fields as FieldModel[], verb, endpoint, id);
+          const temp = this.getFields(schema.fields as FieldModel[]);
+          if(temp[0] !== undefined) {
+            objects.push(temp[0]);
+          }
+          if(temp[1] !== undefined) {
+            properties.push(temp[1]);
+          }
         }
       })
     }
+    return [objects, properties];
   }
 
-  addResponses(responses: ResponseModel[], verb: string, endpoint: string, id: string) {
+  addResponses(responses: ResponseModel[]): string[][][] {
+    console.log("addResponses");
+    const objects: string[][] = [];
+    const properties: string[][] = [];
     responses.forEach(response => {
       if(response.content) {
         const mediaTypes = response.content.mediaTypes;
@@ -115,45 +144,80 @@ export class SearchStore<T> {
           const schema = mediaType.schema;
           if(schema && schema.oneOf) {
             schema.oneOf.forEach(s => {
-              this.getFields(s.fields as FieldModel[], verb, endpoint, id);
+              const temp = this.getFields(s.fields as FieldModel[]);
+              if(temp[0] !== undefined) {
+                objects.push(temp[0]);
+              }
+              if(temp[1] !== undefined) {
+                properties.push(temp[1]);
+              }
             })
           }
           else if(schema && schema.fields) {
-            this.getFields(schema.fields as FieldModel[], verb, endpoint, id);
+            const temp = this.getFields(schema.fields as FieldModel[]);
+            if(temp[0] !== undefined) {
+              objects.push(temp[0]);
+            }
+            if(temp[1] !== undefined) {
+              properties.push(temp[1]);
+            }
           }
         })
       }
     })
+    return [objects, properties];
   }
 
-  getFields(fields: FieldModel[], verb: string, endpoint: string, id: string) {
+  getFields(fields: FieldModel[]): string[][] {
+    let objects: string[] = [];
+    let properties: string[] = [];
+    let temp: ReturnObj = { objects: objects, properties: properties }
     fields.forEach(field => {
-      this.getDeepFields(field, verb, endpoint, id);
+      temp = this.getDeepFields(field, temp);
+      if(temp.objects !== undefined) {
+        objects = objects.concat(temp.objects);
+      }
+      if(temp.properties !== undefined) {
+        properties = properties.concat(temp.properties);
+      }
     })
+    return [objects, properties];
   }
 
-  getDeepFields(field: FieldModel, verb: string, endpoint: string, id: string) {
+  getDeepFields(field: FieldModel, temp: ReturnObj): ReturnObj | any {
     // if a field has a schema with other fields
     if(field.schema.fields !== undefined) {
       field.schema.fields.forEach(f => {
-        this.getDeepFields(f, verb, endpoint, id);
+        temp = this.getDeepFields(f, temp);
       })
       // adds the field's name as an object
-      this.add('', '', '', '', '', field.name, '', verb, endpoint, id as any);
-      return;
+      if(field.name !== undefined) {
+        temp.objects.push(field.name);
+        // console.log("temp.objects")
+        // console.log(temp.objects);
+      }
+      return temp;
     }
     // if a field's schema doesn't have fields but the field's schema does have items in it
     if(field.schema.items !== undefined && field.schema.items.fields !== undefined) {
       field.schema.items.fields.forEach(f => {
-        this.getDeepFields(f, verb, endpoint, id);
+        temp = this.getDeepFields(f, temp);
       });
       // adds the field's name as an object
-      this.add('', '', '', '', '', field.name, '', verb, endpoint, id as any);
-      return;
+      if(field.name !== undefined) {
+        temp.objects.push(field.name);
+        // console.log("temp.objects")
+        // console.log(temp.objects);
+      }
+      return temp;
     }
     // this is where we would like to add properties
     if(field.name !== undefined) {
-      this.add('', '', '', '', '', '', field.name, verb, endpoint, id as any);
+      temp.properties.push(field.name);
+      // console.log("temp.properties")
+      // console.log(temp.properties);
+      // console.log(temp);
+      return temp;
     }
   }
 }

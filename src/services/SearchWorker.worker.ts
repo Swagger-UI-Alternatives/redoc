@@ -205,9 +205,11 @@ initEmpty();
 
 const expandTerm = term => '*' + lunr.stemmer(new lunr.Token(term, {})) + '*';
 
-export function add<T>(title: string, description: string, longDescription: string, path: string, query: string, object: string, property: string, verb: string, endpoint: string, meta?: T) { //anthony added longdescription 
+export function add<T>(title: string, description: string, longDescription: string, path: string[], query: string[], object: string[][], property: string[][], verb: string, endpoint: string, meta?: T) { //anthony added longdescription 
   const ref = store.push(meta) - 1;
-  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: path.toLowerCase(), query: query.toLowerCase(), object: object.toLowerCase(), property: property.toLowerCase(), verb: verb.toLowerCase(), endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
+  const obj = new Set(lunr.utils.asString(object).split(','));
+  const prop = new Set(lunr.utils.asString(property).split(','));
+  const item = { title: title.toLowerCase(), description: description.toLowerCase(), longDescription: longDescription.toLowerCase(), path: lunr.utils.asString(path), query: lunr.utils.asString(query), object: lunr.utils.asString(Array.from(obj)), property: lunr.utils.asString(Array.from(prop)), verb: verb.toLowerCase(), endpoint: endpoint.toLowerCase(), ref }; //anthony added longdescription
   // console.log("adding item in SearchWorker.worker");
   // console.log(item); //anthony
   builder.add(item);
@@ -270,8 +272,8 @@ export async function search<Meta = string>(
     while((i = regex.exec(q)) !== null) {
       arrInput.push(i);
     }
-    console.log("while loop results");
-    console.log(arrInput);
+    // console.log("while loop results");
+    // console.log(arrInput);
 
     const verbFilter: string[] = [];
     const endpointFilter: string[] = [];
@@ -352,18 +354,18 @@ export async function search<Meta = string>(
       }
     }); 
 
-    console.log("endpoints, fields, then search");
-    console.log(verbFilter);
-    console.log(fieldsArray);
-    console.log(searchItems);
-    console.log("verbLookup");
-    console.log(verbLookup);
+    // console.log("endpoints, fields, then search");
+    // console.log(verbFilter);
+    // console.log(fieldsArray);
+    // console.log(searchItems);
+    // console.log("verbLookup");
+    // console.log(verbLookup);
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
     // i.e. if there is no httpVerb before then this is performed
     // default search
     if(fieldsArray.length === 0 && verbFilter.length === 0) {
-      console.log("case 1");
+      // console.log("case 1");
       if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -382,67 +384,71 @@ export async function search<Meta = string>(
         // if there's at least one httpVerb in the user input
         // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
         // then 'get' is added to the prohibited array list
+      // match prohibitedVerbs list of strings against
+      // filters out things we know we don't want in the results
       queryObject.term(prohibitedVerbs(), {
-        fields: ['verb'], // match prohibitedVerbs list of strings against 
-        presence: lunr.Query.presence.PROHIBITED  // filters out things we know we don't want in the results
+        fields: ['verb'], 
+        presence: lunr.Query.presence.PROHIBITED  
       });
       // now we're getting every endpoint
+      // we use title here to get any endpoint
+      // /anything
       queryObject.term(['/'], {
-        fields: ['title'],  // we use title here to get any endpoint
-        wildcard: lunr.Query.wildcard.TRAILING  // /anything
+        fields: ['title'],  
+        wildcard: lunr.Query.wildcard.TRAILING  
       });
     }
-    /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
-    // if there is at least one verbFilter
-    if(verbFilter.length > 0) {
-      queryObject.term(prohibitedVerbs(), {
-        fields: ['verb'],
-        presence: lunr.Query.presence.PROHIBITED
-      });
-      // if there is at least one endpointFilter
-      // NOTE **i think we should only support 1 endpointFilter at the most**
-      if(endpointFilter.length > 0) {
-        endpointFilter.forEach(ep => {
-          queryObject.term(ep, {
-            fields: ['endpoint'],
+    // else {
+      /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
+      // if there is at least one verbFilter
+      if(verbFilter.length > 0) {
+        queryObject.term(prohibitedVerbs(), {
+          fields: ['verb'],
+          presence: lunr.Query.presence.PROHIBITED
+        });
+        // if there is at least one endpointFilter
+        // NOTE **i think we should only support 1 endpointFilter at the most**
+        if(endpointFilter.length > 0) {
+          endpointFilter.forEach(ep => {
+            queryObject.term(ep, {
+              fields: ['endpoint'],
+              presence: lunr.Query.presence.REQUIRED
+            })
+          });
+        }
+      }
+      // after the verbFilter/endpointFilter(s) happen (or not)
+      // if there is at least one KEYWORD[searchTerm(s)]
+      if(fieldsArray.length > 0 && searchItems.length > 0) {
+        // console.log("case 3");
+        let count: number = 0;
+        // if there is only 1 fieldsArray we can specify that the presence is required
+        if(fieldsArray.length === 1 && searchItems[count].length === 1) {
+          // console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
+          queryObject.term(searchItems[count], {
+            fields: [fieldsArray[count]],
             presence: lunr.Query.presence.REQUIRED
           })
-        });
-      }
-    }
-    // after the verbFilter/endpointFilter(s) happen (or not)
-    // if there is at least one KEYWORD[searchTerm(s)]
-    if(fieldsArray.length > 0 && searchItems.length > 0) {
-      console.log("case 3");
-      let count: number = 0;
-      // if there is only 1 fieldsArray we can specify that the presence is required
-      if(fieldsArray.length === 1 && searchItems[count].length === 1) {
-        console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
-        queryObject.term(searchItems[count], {
-          fields: [fieldsArray[count]],
-          presence: lunr.Query.presence.REQUIRED
-        })
-      }
-      // otherwise, there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
-      else {
-        console.log("case 3.2: multiple fieldArrays");
-        // for each fields KEYWORD
-        fieldsArray.forEach(field => {
-          console.log("field");
-          console.log(field);
-          // add the searchItems and match against whatever fields
-          queryObject.term(searchItems[count], {
-            fields: [field]
+        }
+        // otherwise, there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
+        else {
+          // console.log("case 3.2: multiple fieldArrays");
+          // for each fields KEYWORD
+          fieldsArray.forEach(field => {
+            // add the searchItems and match against whatever fields
+            queryObject.term(searchItems[count], {
+              fields: [field]
+            })
+            // queryObject.term('', {
+            //   fields: [field],
+            //   presence: lunr.Query.presence.PROHIBITED
+            // })
+            count++;
           })
-          // queryObject.term('', {
-          //   fields: [field],
-          //   presence: lunr.Query.presence.PROHIBITED
-          // })
-          count++;
-        })
+        }
+        // count++;
       }
-      // count++;
-    }
+    // }
   });
 
   if (limit > 0) {

@@ -163,39 +163,39 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     }));
 
     //start anthony
-    let currId = '';
-    let index = 0,count=0;
-    const aggResults: Aggregate[] = []; 
-    results.sort(this.compare);
-    //console.log('results');
-    //console.log(results);
-    results.forEach(curr => {
-      if(curr !== undefined) {
+    // let currId = '';
+    // let index = 0,count=0;
+    // const aggResults: Aggregate[] = []; 
+    // results.sort(this.compare);
+    // //console.log('results');
+    // //console.log(results);
+    // results.forEach(curr => {
+    //   if(curr !== undefined) {
     
-        if(currId === ''){
-          currId = curr.item.id;
-          aggResults.push(curr); //push first onto results
-          count++;
-        }
-        else if(curr.item.id === currId){
-          aggResults[index].score += curr.score;
-          count++;
-        }
-        else {
-          aggResults[index].score = aggResults[index].score/count;
-          currId = curr.item.id;
-          aggResults.push(curr);
-          index++;
-          count=1;
-        }
-      }
-    });
+    //     if(currId === ''){
+    //       currId = curr.item.id;
+    //       aggResults.push(curr); //push first onto results
+    //       count++;
+    //     }
+    //     else if(curr.item.id === currId){
+    //       aggResults[index].score += curr.score;
+    //       count++;
+    //     }
+    //     else {
+    //       aggResults[index].score = aggResults[index].score/count;
+    //       currId = curr.item.id;
+    //       aggResults.push(curr);
+    //       index++;
+    //       count=1;
+    //     }
+    //   }
+    // });
     //  console.log(aggResults);
-    aggResults.sort((a, b) => b.score - a.score);
+    // aggResults.sort((a, b) => b.score - a.score);
     //console.log('aggresults');
     //console.log(aggResults);
 
-    // results.sort((a, b) => b.score - a.score);
+    results.sort((a, b) => b.score - a.score);
 
     return (
       <SearchWrap role="search">
@@ -209,14 +209,14 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           type="text"
           onChange={this.search}
         />
-        {aggResults.length > 0 && (
+        {results.length > 0 && (
           <PerfectScrollbarWrap
             options={{
               wheelPropagation: false,
             }}
           >
             <SearchResultsBox data-role="search:results">
-              {aggResults.map((res, idx) => (
+              {results.map((res, idx) => (
                 <MenuItem
                   item={Object.create(res.item, {
                     active: {
@@ -235,13 +235,13 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       </SearchWrap>
     );
   }
-  compare( a, b ) {
-    if ( a.item.id < b.item.id ){
-      return -1;
-    }
-    if ( a.item.id > b.item.id ){
-      return 1;
-    }
-    return 0;
-  }
+  // compare( a, b ) {
+  //   if ( a.item.id < b.item.id ){
+  //     return -1;
+  //   }
+  //   if ( a.item.id > b.item.id ){
+  //     return 1;
+  //   }
+  //   return 0;
+  // }
 }
