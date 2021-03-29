@@ -255,7 +255,7 @@ export async function dispose() {
 //const regex = /(TITLE|PATH|QUERY|OBJECT|PROPERTY)\[(.+?)\]/g;
 // ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
 
-const regex = /(POST|GET|PATCH|DELETE)|([a-z\/\.\-\{\}]+)|(TITLE|PATH|QUERY|PROPERTY|OBJECT|ENDPOINT)\[(.+?)\]/g;
+const regex = /(GET|POST|PATCH|DELETE)|([a-z\/\.\-\{\}]+)|(PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
 
 export async function search<Meta = string>(
   q: string,
@@ -378,8 +378,8 @@ export async function search<Meta = string>(
       })
     }
     // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)
-    if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
-      console.log("case 2");
+    else if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
+      // console.log("case 2");
       // first get the verbs from the function that retrieves the verbs assigned prohibited (value = true)
         // if there's at least one httpVerb in the user input
         // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
@@ -398,24 +398,24 @@ export async function search<Meta = string>(
         wildcard: lunr.Query.wildcard.TRAILING  
       });
     }
-    // else {
-      /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
-      // if there is at least one verbFilter
+    /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
+    // if there is at least one verbFilter
+    else {
       if(verbFilter.length > 0) {
         queryObject.term(prohibitedVerbs(), {
           fields: ['verb'],
           presence: lunr.Query.presence.PROHIBITED
         });
-        // if there is at least one endpointFilter
-        // NOTE **i think we should only support 1 endpointFilter at the most**
-        if(endpointFilter.length > 0) {
-          endpointFilter.forEach(ep => {
-            queryObject.term(ep, {
-              fields: ['endpoint'],
-              presence: lunr.Query.presence.REQUIRED
-            })
-          });
-        }
+      }
+      // if there is at least one endpointFilter
+      // NOTE **i think we should only support 1 endpointFilter at the most**
+      if(endpointFilter.length === 1) {
+        endpointFilter.forEach(ep => {
+          queryObject.term(ep, {
+            fields: ['endpoint'],
+            presence: lunr.Query.presence.REQUIRED
+          })
+        });
       }
       // after the verbFilter/endpointFilter(s) happen (or not)
       // if there is at least one KEYWORD[searchTerm(s)]
@@ -439,16 +439,11 @@ export async function search<Meta = string>(
             queryObject.term(searchItems[count], {
               fields: [field]
             })
-            // queryObject.term('', {
-            //   fields: [field],
-            //   presence: lunr.Query.presence.PROHIBITED
-            // })
             count++;
           })
         }
-        // count++;
       }
-    // }
+    }
   });
 
   if (limit > 0) {

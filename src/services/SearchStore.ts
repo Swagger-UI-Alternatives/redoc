@@ -43,10 +43,12 @@ export class SearchStore<T> {
             const resp: string[][][] = this.addResponses(group.responses);
             const objects = req[0].concat(resp[0]);
             const properties = req[1].concat(resp[1]);
-            this.add(group.name, group.description || '', group.longDescription || '', params[0], params[1], objects, properties, group.httpVerb, group.name, group.id);                         // anthony added longdescription
+            this.add(group.name, group.description || '', group.longDescription || '', 
+              params[0], params[1], objects, properties, group.httpVerb, group.name, group.id);
           }
           else {
-            this.add(group.name, group.description || '', group.longDescription || '', [''], [''], [['']], [['']], '', '', group.id);                                             // anthony added longdescription
+            this.add(group.name, group.description || '', group.longDescription || '', 
+              [''], [''], [['']], [['']], '', '', group.id);
           }
         }
         recurse(group.items);
@@ -85,7 +87,7 @@ export class SearchStore<T> {
     }
   }
 
-  // function that adds all the parameters to a string to be searched for
+  // function that returns the paths and queries of an operation as an object
   addParams(parameters: FieldModel[]): string[][] {
     const paths: string[] = [];
     const queries: string[] = [];
@@ -101,7 +103,6 @@ export class SearchStore<T> {
   }
 
   addRequestBody(requestBody: RequestBodyModel): string[][][] {
-    console.log("addRequestBody");
     const objects: string[][] = [];
     const properties: string[][] = [];
     if(requestBody as RequestBodyModel && requestBody.content) {
@@ -134,7 +135,6 @@ export class SearchStore<T> {
   }
 
   addResponses(responses: ResponseModel[]): string[][][] {
-    console.log("addResponses");
     const objects: string[][] = [];
     const properties: string[][] = [];
     responses.forEach(response => {
@@ -190,11 +190,9 @@ export class SearchStore<T> {
       field.schema.fields.forEach(f => {
         temp = this.getDeepFields(f, temp);
       })
-      // adds the field's name as an object
+      // adds the field's name to the array of objects
       if(field.name !== undefined) {
         temp.objects.push(field.name);
-        // console.log("temp.objects")
-        // console.log(temp.objects);
       }
       return temp;
     }
@@ -203,20 +201,15 @@ export class SearchStore<T> {
       field.schema.items.fields.forEach(f => {
         temp = this.getDeepFields(f, temp);
       });
-      // adds the field's name as an object
+      // adds the field's name to the array of objects
       if(field.name !== undefined) {
         temp.objects.push(field.name);
-        // console.log("temp.objects")
-        // console.log(temp.objects);
       }
       return temp;
     }
     // this is where we would like to add properties
     if(field.name !== undefined) {
       temp.properties.push(field.name);
-      // console.log("temp.properties")
-      // console.log(temp.properties);
-      // console.log(temp);
       return temp;
     }
   }

@@ -124,15 +124,39 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     this.setState({
       results,
     });
-    this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight 
+    // ex of a term:
+    // PATCH PATH[uuid]
+    // this goes into the marker to be marked.
+    // so let's pull all searchTerms from the brackets to be highlighted with a regular expression
+    // const s = term.split(/\s+]/) // splits on spaces
+    const re = /[\w\/\.\-\{\}]+/g;
+    const s = term.match(re);
+    // console.log(s);
+    // console.log(term);
+    if(s !== null) {
+      let a: string = "";
+      s.forEach(i => {
+        if(!(i === 'PATH' || i === 'QUERY' || i === 'OBJECT' || i === 'PROPERTY')) {
+          a += i + " ";
+        }
+      })
+      this.props.marker.mark(a); //calls mark() from services/MarkerService.ts to highlight 
+    }
+    else {
+      this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight
+    }
+    // this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight
+    // this.props.marker.mark(a); //calls mark() from services/MarkerService.ts to highlight 
   }
 
   @bind
   @debounce(400)
   searchCallback(searchTerm: string) {
-    console.log("searchCallback");
+    console.log("searchCallback - making a search");
     // time to go into SearchStore
     this.props.search.search(searchTerm).then(res => {
+      console.log("after callback: res");
+      console.log(res);
       this.setResults(res, searchTerm);
     });
   }
@@ -161,41 +185,41 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       item: this.props.getItemById(res.meta)!,
       score: res.score,
     }));
-
+    /* maybe we have to move the aggregate results elsewhere? Not sure */
     //start anthony
-    // let currId = '';
-    // let index = 0,count=0;
-    // const aggResults: Aggregate[] = []; 
-    // results.sort(this.compare);
-    // //console.log('results');
-    // //console.log(results);
-    // results.forEach(curr => {
-    //   if(curr !== undefined) {
+    let currId = '';
+    let index = 0,count=0;
+    const aggResults: Aggregate[] = []; 
+    results.sort(this.compare);
+    //console.log('results');
+    //console.log(results);
+    results.forEach(curr => {
+      if(curr !== undefined) {
     
-    //     if(currId === ''){
-    //       currId = curr.item.id;
-    //       aggResults.push(curr); //push first onto results
-    //       count++;
-    //     }
-    //     else if(curr.item.id === currId){
-    //       aggResults[index].score += curr.score;
-    //       count++;
-    //     }
-    //     else {
-    //       aggResults[index].score = aggResults[index].score/count;
-    //       currId = curr.item.id;
-    //       aggResults.push(curr);
-    //       index++;
-    //       count=1;
-    //     }
-    //   }
-    // });
-    //  console.log(aggResults);
-    // aggResults.sort((a, b) => b.score - a.score);
-    //console.log('aggresults');
-    //console.log(aggResults);
+        if(currId === ''){
+          currId = curr.item.id;
+          aggResults.push(curr); //push first onto results
+          count++;
+        }
+        else if(curr.item.id === currId){
+          aggResults[index].score += curr.score;
+          count++;
+        }
+        else {
+          aggResults[index].score = aggResults[index].score/count;
+          currId = curr.item.id;
+          aggResults.push(curr);
+          index++;
+          count=1;
+        }
+      }
+    });
+    console.log(aggResults);
+    aggResults.sort((a, b) => b.score - a.score);
+    console.log('aggresults');
+    console.log(aggResults);
 
-    results.sort((a, b) => b.score - a.score);
+    // results.sort((a, b) => b.score - a.score);
 
     return (
       <SearchWrap role="search">
@@ -209,14 +233,14 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           type="text"
           onChange={this.search}
         />
-        {results.length > 0 && (
+        {aggResults.length > 0 && (
           <PerfectScrollbarWrap
             options={{
               wheelPropagation: false,
             }}
           >
             <SearchResultsBox data-role="search:results">
-              {results.map((res, idx) => (
+              {aggResults.map((res, idx) => (
                 <MenuItem
                   item={Object.create(res.item, {
                     active: {
@@ -235,13 +259,13 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       </SearchWrap>
     );
   }
-  // compare( a, b ) {
-  //   if ( a.item.id < b.item.id ){
-  //     return -1;
-  //   }
-  //   if ( a.item.id > b.item.id ){
-  //     return 1;
-  //   }
-  //   return 0;
-  // }
+  compare( a, b ) {
+    if ( a.item.id < b.item.id ){
+      return -1;
+    }
+    if ( a.item.id > b.item.id ){
+      return 1;
+    }
+    return 0;
+  }
 }
