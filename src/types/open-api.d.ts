@@ -40,7 +40,7 @@ export interface OpenAPIPaths {
 export interface OpenAPIRef {
   $ref: string;
 }
-// 
+
 export type Referenced<T> = OpenAPIRef | T;
 
 export interface OpenAPIPath {

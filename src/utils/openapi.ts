@@ -595,9 +595,9 @@ export function isRedocExtension(key: string): boolean {
     'x-additionalPropertiesName': true,
     'x-explicitMappingOnly': true,
     // ONTAP Redoc extensions
-    'x-ntap-long-description': true,  // Jarod-added J-docTag
-    'x-ntap-introduced': true,        // Jarod-added J-intro J-version
-    'x-ntap-deprecated': true,        // Jarod-added J-dep J-version
+    // 'x-ntap-long-description': true,  // Jarod-added J-docTag
+    // 'x-ntap-introduced': true,        // Jarod-added J-intro J-version
+    // 'x-ntap-deprecated': true,        // Jarod-added J-dep J-version
   };
 
   return key in redocExtensions;
