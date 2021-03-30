@@ -1,13 +1,5 @@
 import styled from '../../styled-components';
 
-/* export const LoginModal = styled.div`
-  border: 1px solid red;
-  color: red;
-  font-weight: normal;
-  margin-left: 0.5em;
-  display: block;
-`; */
-
 export const LoginModal = styled.div`
   display: block;
   position: fixed;
@@ -75,3 +67,28 @@ export const AuthorizeButton = styled.button`
   cursor: pointer;
   margin-bottom: 1.25em;
 `;
+
+/* export const UnlockIcon = styled((props: { className?: string }) => (
+  <svg
+     className={props.className}
+     viewBox="0 0 64 64"
+     width="16"
+     height="16"
+     xmlns="http://www.w3.org/2000/svg"
+  >
+  <path d="M19 30V15A13 13 0 0 1 32 2a13 13 0 0 1 13 13v2a2 2 0 0 1-4 0v-2a9 9 0 1 0-18 0v15"/>
+  <path d="M10 30h44v32H10z"/>
+  <path d="M34 49a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2 2 2 0 0 1 2 2z"/>
+  </svg>
+)).attrs({
+  className: 'question-icon',
+})`
+  position: absolute;
+  left: ${props => props.theme.spacing.unit * 4}px;
+  height: 1.8em;
+  width: 0.9em;
+
+  path {
+    fill: ${props => props.theme.sidebar.textColor};
+  }
+`; */

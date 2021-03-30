@@ -19,6 +19,8 @@ import {
   SearchInput,
   SearchResultsBox,
   SearchWrap,
+  QuestionIcon,
+  QuestionToolTip
 } from './styled.elements';
 
 // when writing React components with TypeScript, you have 2 options for typing its props:
@@ -172,6 +174,15 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           type="text"
           onChange={this.search}
         />
+        {!this.state.term && <QuestionToolTip>
+          <span className="tooltiptext">
+            The following keywords are supported: GET, POST, PATCH, DELETE
+            TITLE, PATH, QUERY, PROPERTY, OBJECT<br /><br />
+            To search using a keyword, please use the following format: KEYWORD[search term]<br /><br />
+            To search using multiple keywords, please include a space between them.
+          </span>
+          <QuestionIcon />
+        </QuestionToolTip>}
         {results.length > 0 && (
           <PerfectScrollbarWrap
             options={{
