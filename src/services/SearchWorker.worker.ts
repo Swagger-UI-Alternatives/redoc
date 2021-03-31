@@ -177,7 +177,7 @@ const myStopWordFilter = lunr.generateStopWordFilter([
 // initialize a new builder
 function initEmpty() {
   builder = new lunr.Builder();
-  builder.field('title', { boost: 10 });
+  builder.field('title');
   builder.field('description');
   builder.field('longDescription'); //anthony added longdescription
   builder.field('path');
@@ -365,7 +365,7 @@ export async function search<Meta = string>(
     // i.e. if there is no httpVerb before then this is performed
     // default search
     if(fieldsArray.length === 0 && verbFilter.length === 0) {
-      // console.log("case 1");
+      console.log("case 1");
       if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -379,7 +379,7 @@ export async function search<Meta = string>(
     }
     // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)
     else if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
-      // console.log("case 2");
+      console.log("case 2");
       // first get the verbs from the function that retrieves the verbs assigned prohibited (value = true)
         // if there's at least one httpVerb in the user input
         // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
@@ -420,7 +420,7 @@ export async function search<Meta = string>(
       // after the verbFilter/endpointFilter(s) happen (or not)
       // if there is at least one KEYWORD[searchTerm(s)]
       if(fieldsArray.length > 0 && searchItems.length > 0) {
-        // console.log("case 3");
+        console.log("case 3");
         let count: number = 0;
         // if there is only 1 fieldsArray we can specify that the presence is required
         if(fieldsArray.length === 1 && searchItems[count].length === 1) {

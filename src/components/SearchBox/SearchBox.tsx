@@ -46,10 +46,8 @@ export interface SearchBoxState {
   term: string;
   // activeItemIdx is the index of the results
   activeItemIdx: number;
-}
-export interface Aggregate {
-  item: IMenuItem;
-  score: number;
+  // added keywordLen to refresh search results if changed
+  keywordLen: number;
 }
 // SearchBox contains the props from SearchBoxProps and a SearchBoxState
 // React.PureComponent is similar to React.Component. The difference between them is that React.Component doesn’t implement shouldComponentUpdate(), but React.PureComponent implements it with a shallow prop and state comparison.
@@ -67,6 +65,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       results: [],
       term: '',
       activeItemIdx: -1,
+      keywordLen: 0,  // added the keyword length to SearchBox constructor initialization
     };
   }
   // clears the results  but not the activeItemIndex (or term?)
@@ -118,7 +117,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       }
     }
   };
-  // 
+
   setResults(results: SearchResult[], term: string) {
     console.log("setResults");
     this.setState({
@@ -145,8 +144,6 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     else {
       this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight
     }
-    // this.props.marker.mark(term); //calls mark() from services/MarkerService.ts to highlight
-    // this.props.marker.mark(a); //calls mark() from services/MarkerService.ts to highlight 
   }
 
   @bind
@@ -162,13 +159,33 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   }
 
   search = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("search");
+    console.log("search for");
     const q = event.target.value;
-    // console.log(typeof(q));
     // it takes at least 3 characters to actually search for something
     if (q.length < 3) {
       this.clearResults(q);
       return;
+    }
+
+    // so we have the current length and the keywordLen
+    // first parse out the input and assign it to variable s
+    // then if s.length is different from the current keyword length, clear results and return
+    const re = /[\w\/\.\-\{\}]+/g;
+    const s = q.match(re);
+    console.log(s);
+    if(s !== null) {
+      if(this.state.keywordLen === null) {
+        this.setState({
+          keywordLen: s.length,
+        });
+      }
+      else if(this.state.keywordLen !== s.length) {
+        this.setState({
+          keywordLen: s.length,
+        });
+        this.clearResults(q);
+        // return;
+      }
     }
 
     this.setState(
@@ -185,41 +202,8 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       item: this.props.getItemById(res.meta)!,
       score: res.score,
     }));
-    /* maybe we have to move the aggregate results elsewhere? Not sure */
-    //start anthony
-    let currId = '';
-    let index = 0,count=0;
-    const aggResults: Aggregate[] = []; 
-    results.sort(this.compare);
-    //console.log('results');
-    //console.log(results);
-    results.forEach(curr => {
-      if(curr !== undefined) {
-    
-        if(currId === ''){
-          currId = curr.item.id;
-          aggResults.push(curr); //push first onto results
-          count++;
-        }
-        else if(curr.item.id === currId){
-          aggResults[index].score += curr.score;
-          count++;
-        }
-        else {
-          aggResults[index].score = aggResults[index].score/count;
-          currId = curr.item.id;
-          aggResults.push(curr);
-          index++;
-          count=1;
-        }
-      }
-    });
-    console.log(aggResults);
-    aggResults.sort((a, b) => b.score - a.score);
-    console.log('aggresults');
-    console.log(aggResults);
 
-    // results.sort((a, b) => b.score - a.score);
+    results.sort((a, b) => b.score - a.score);
 
     return (
       <SearchWrap role="search">
@@ -233,14 +217,14 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
           type="text"
           onChange={this.search}
         />
-        {aggResults.length > 0 && (
+        {results.length > 0 && (
           <PerfectScrollbarWrap
             options={{
               wheelPropagation: false,
             }}
           >
             <SearchResultsBox data-role="search:results">
-              {aggResults.map((res, idx) => (
+              {results.map((res, idx) => (
                 <MenuItem
                   item={Object.create(res.item, {
                     active: {
@@ -258,14 +242,5 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
         )}
       </SearchWrap>
     );
-  }
-  compare( a, b ) {
-    if ( a.item.id < b.item.id ){
-      return -1;
-    }
-    if ( a.item.id > b.item.id ){
-      return 1;
-    }
-    return 0;
   }
 }
