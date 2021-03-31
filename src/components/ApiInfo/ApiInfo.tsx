@@ -102,6 +102,14 @@ export class ApiInfo extends React.Component<ApiInfoProps> {
                 >
                   Download
                 </DownloadButton>
+                
+                <AuthorizeButton
+                  target="_blank"
+                  onClick={this.showAuthLogin}>
+                  Authorize &#128274;
+                </AuthorizeButton>
+                <AuthorizationLogin onClose={this.showAuthLogin} show={this.state.show}>
+                </AuthorizationLogin>
               </p>
             )}
             <StyledMarkdownBlock>
@@ -117,13 +125,6 @@ export class ApiInfo extends React.Component<ApiInfoProps> {
             <Markdown source={store.spec.info.description} data-role="redoc-description" />
             {externalDocs && <ExternalDocumentation externalDocs={externalDocs} />}
               {<p>
-                <AuthorizeButton
-                  target="_blank"
-                  onClick={this.showAuthLogin}>
-                  Authorize &#128274;
-                </AuthorizeButton>
-                <AuthorizationLogin onClose={this.showAuthLogin} show={this.state.show}>
-                </AuthorizationLogin>
               </p>}
             </MiddlePanel>
         </Row>
