@@ -372,9 +372,16 @@ export async function search<Meta = string>(
         .forEach(term => {
           if(term.length === 1) return;
           const exp = expandTerm(term);
-          queryObject.term(exp, {
-            fields: ['title','description','longDescription']
-          });
+          if(term.substring(0) === '/') {
+            queryObject.term(exp, {
+              fields: ['title']
+            });
+          }
+          else {
+            queryObject.term(exp, {
+              fields: ['description','longDescription']
+            });
+          }
       })
     }
     // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)

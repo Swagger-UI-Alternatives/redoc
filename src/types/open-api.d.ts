@@ -99,6 +99,8 @@ export interface OpenAPIParameter {
   examples?: { [media: string]: Referenced<OpenAPIExample> };
   content?: { [media: string]: OpenAPIMediaType };
   encoding?: Record<string, OpenAPIEncoding>;
+  introducedIn?: string;  // version-fields
+  deprecatedIn?: string;  // version-fields
 }
 
 export interface OpenAPIExample {
@@ -128,6 +130,8 @@ export interface OpenAPISchema {
   anyOf?: OpenAPISchema[];
   allOf?: OpenAPISchema[];
   not?: OpenAPISchema;
+  introducedIn?: string;  // version-fields
+  deprecatedIn?: string;  // version-fields
   
   title?: string;
   multipleOf?: number;

@@ -45,6 +45,9 @@ export class SchemaModel {
   default?: any;
   readOnly: boolean;
   writeOnly: boolean;
+  // version-field
+  introducedIn?: string;
+  deprecatedIn?: string;
 
   constraints: string[];
 
@@ -120,6 +123,13 @@ export class SchemaModel {
     this.default = schema.default;
     this.readOnly = !!schema.readOnly;
     this.writeOnly = !!schema.writeOnly;
+    // version-field
+    if(schema['x-ntap-introduced'] !== undefined) {
+      console.log("schema");
+      console.log(schema['x-ntap-introduced']);
+    }
+    this.introducedIn = schema['x-ntap-introduced'];
+    this.deprecatedIn = schema['x-ntap-introduced'];
 
     if (this.isCircular) {
       return;

@@ -91,7 +91,6 @@ export class OperationMenuItemContent extends React.Component<OperationMenuItemC
     if(item.httpVerb === 'doc') {
       return(undefined);
     }
-
     // Note: I want to assign deprecated=true if deprecatedIn is assigned in Operation. 
     // Before rendering of the menuitems and the contentitems.
 
