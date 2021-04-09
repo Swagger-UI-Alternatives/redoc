@@ -249,11 +249,6 @@ export async function dispose() {
   store = [];
   initEmpty();
 }
-// regexr
-// const regex = /(TITLE|PATH|QUERY|REQ|RESP)\[(\w+)\]*/g;
-
-//const regex = /(TITLE|PATH|QUERY|OBJECT|PROPERTY)\[(.+?)\]/g;
-// ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
 
 const regex = /(GET|POST|PATCH|DELETE|DOC)|([a-z\/\.\-\{\}]+)|(PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
 
@@ -272,8 +267,8 @@ export async function search<Meta = string>(
     while((i = regex.exec(q)) !== null) {
       arrInput.push(i);
     }
-    // console.log("while loop results");
-    // console.log(arrInput);
+    console.log("while loop results");
+    console.log(arrInput);
 
     const verbFilter: string[] = [];
     const endpointFilter: string[] = [];
@@ -355,12 +350,15 @@ export async function search<Meta = string>(
       }
     }); 
 
-    // console.log("endpoints, fields, then search");
-    // console.log(verbFilter);
-    // console.log(fieldsArray);
-    // console.log(searchItems);
-    // console.log("verbLookup");
-    // console.log(verbLookup);
+    console.log("verbFilter");
+    console.log(verbFilter);
+    console.log("endpointFilter")
+    console.log(endpointFilter)
+    console.log("fieldsArray");
+    console.log(fieldsArray);
+    console.log("searchItems");
+    console.log(searchItems);
+
 
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
     // i.e. if there is no httpVerb before then this is performed
@@ -368,12 +366,18 @@ export async function search<Meta = string>(
     console.log("let the filters begin");
     if(verbFilter.length === 0 && fieldsArray.length === 0) {
       console.log("case 1");
+      let onlyOneEndpoint: boolean = false;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
         .forEach(term => {
           if(term.length === 1) return;
           const exp = expandTerm(term);
-          if(term.substring(0, 1) === '/') {
+          if(exp.substring(1, 2) === '/') {
+            if(onlyOneEndpoint === false) {
+              onlyOneEndpoint = true;
+            } else {
+              return;
+            }
             console.log("case 1.1");
             queryObject.term(exp, {
               fields: ['title'] // searches tags and operations
@@ -411,6 +415,7 @@ export async function search<Meta = string>(
     /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
     // if there is at least one verbFilter
     else {
+      console.log("BUILD OBJECT");
       if(verbFilter.length > 0) {
         queryObject.term(prohibitedVerbs(), {
           fields: ['verb'],
@@ -420,21 +425,19 @@ export async function search<Meta = string>(
       // if there is at least one endpointFilter
       // NOTE **i think we should only support 1 endpointFilter at the most**
       if(endpointFilter.length === 1) {
-        endpointFilter.forEach(ep => {
-          queryObject.term(ep, {
-            fields: ['endpoint'],
-            presence: lunr.Query.presence.REQUIRED
-          })
-        });
+        queryObject.term(endpointFilter, {
+          fields: ['endpoint'],
+          presence: lunr.Query.presence.REQUIRED
+        })
       }
       // after the verbFilter/endpointFilter(s) happen (or not)
       // if there is at least one KEYWORD[searchTerm(s)]
       if(fieldsArray.length > 0 && searchItems.length > 0) {
-        console.log("case 3");
+        console.log("case 3: at least one KEYWORD[searchTerm] with a searchTerm");
         let count: number = 0;
         // if there is only 1 fieldsArray we can specify that the presence is required
         if(fieldsArray.length === 1 && searchItems[count].length === 1) {
-          // console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
+          console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
           queryObject.term(searchItems[count], {
             fields: [fieldsArray[count]],
             presence: lunr.Query.presence.REQUIRED
@@ -442,7 +445,7 @@ export async function search<Meta = string>(
         }
         // otherwise, there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
         else {
-          // console.log("case 3.2: multiple fieldArrays");
+          console.log("case 3.2: multiple fieldArrays");
           // for each fields KEYWORD
           fieldsArray.forEach(field => {
             // add the searchItems and match against whatever fields
@@ -452,6 +455,54 @@ export async function search<Meta = string>(
             count++;
           })
         }
+      }
+      // if there is not at least one KEYWORD[searchTerm(s)]
+      // i.e. endpointFilter > 1 i.e. KEYWORD[blah doesn't have an ending square bracket
+      else {
+        console.log("else condition");
+        let oneEndpoint: boolean = false;
+        endpointFilter.forEach(ep => {
+          if(ep.substring(1, 2) === '/') {
+            console.log("else cond 1");
+            if(oneEndpoint === false) {
+              oneEndpoint = true;
+            } else {
+              console.log("return 1");
+              return;
+            }
+            queryObject.term(ep, {
+              fields: ['endpoint'],
+              presence: lunr.Query.presence.REQUIRED
+            });
+          }
+          else { //if(oneEndpoint) {
+            console.log("return 2");
+            return;
+          }
+
+          // if(ep.substring(0, 1) === '/') {
+          //   if(onlyOneEndpoint === false) {
+          //     onlyOneEndpoint = true;
+          //   } else {
+          //     return;
+          //   }
+          //   console.log("case 1.1");
+          //   queryObject.term(exp, {
+          //     fields: ['title'] // searches tags and operations
+          //   });
+          // }
+
+
+          // else {
+          //   console.log("case 1.2");
+          //   queryObject.term(ep, {
+          //     fields: ['description','longDescription']
+          //   });
+          // }
+
+
+
+        });
       }
     }
   });
