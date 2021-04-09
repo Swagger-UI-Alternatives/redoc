@@ -85,10 +85,10 @@ export class FieldModel {
     this.description =
       info.description === undefined ? this.schema.description || '' : info.description;
     this.example = info.example || this.schema.example;
-    if(this.schema.introducedIn !== undefined) {
-      console.log("this.schema.introducedIn");
-      console.log(this.schema.title + " " + this.schema.introducedIn);
-    }
+    // if(this.schema.introducedIn !== undefined) {
+    //   console.log("this.schema.introducedIn");
+    //   console.log(this.schema.title + " " + this.schema.introducedIn);
+    // }
     if (info.examples !== undefined) {
       this.examples = mapValues(
         info.examples,

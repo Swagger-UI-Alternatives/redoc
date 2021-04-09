@@ -41,6 +41,7 @@ export interface TagGroup {
 
 export const GROUP_DEPTH = 0;
 export let VERSION: string = '';  // Jarod-added J-version
+
 export type ContentItemModel = GroupModel | OperationModel;
 
 export class MenuBuilder {

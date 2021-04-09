@@ -137,11 +137,13 @@ export class OperationModel implements IMenuItem {
       this.servers = normalizeServers('', operationSpec.servers || operationSpec.pathServers || []);
     } else {
       this.id =
-        operationSpec.operationId !== undefined
-          ? 'operation/' + operationSpec.operationId
-          : parent !== undefined
-          ? parent.id + this.pointer
-          : this.pointer;
+      operationSpec.operationId !== undefined && parent !== undefined   // added these 2 lines
+        ? parent.id + '/operation/' + operationSpec.operationId         // this fixes duplicate operation key error in search
+        : operationSpec.operationId !== undefined
+        ? 'operation/' + operationSpec.operationId
+        : parent !== undefined
+        ? parent.id + this.pointer
+        : this.pointer;
 
       this.security = (operationSpec.security || parser.spec.security || []).map(
         (security) => new SecurityRequirementModel(security, parser),

@@ -4073,6 +4073,7 @@ definitions:
         type: string
         readOnly: true
         example: "/api/resourcelink"
+    x-ntap-introduced: '9.6'
   
   self_link:
     type: object
@@ -4080,6 +4081,7 @@ definitions:
     properties:
       self:
         $ref: "#/definitions/href"
+    x-ntap-introduced: '9.6'
   
   related_link:
     type: object
@@ -4311,6 +4313,7 @@ definitions:
         format: uuid
         readOnly: true
         description: The UUID of the asynchronous job that is triggered by a POST, PATCH, or DELETE operation.
+        x-ntap-introduced: '9.8'
       _links:
         $ref: "#/definitions/self_link"
 

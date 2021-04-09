@@ -172,23 +172,21 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     // so we have the current length and the keywordLen
     // first parse out the input and assign it to variable s
     // then if s.length is different from the current keyword length, clear results and return
-    // const re = /[\w\/\.\-\{\}]+/g;
-    // const s = q.match(re);
-    // console.log(s);
-    // if(s !== null) {
-    //   if(this.state.keywordLen === null) {
-    //     this.setState({
-    //       keywordLen: s.length,
-    //     });
-    //   }
-    //   else if(this.state.keywordLen !== s.length) {
-    //     this.setState({
-    //       keywordLen: s.length,
-    //     });
-    //     this.clearResults(q);
-    //     // return;
-    //   }
-    // }
+    const re = /[\w\/\.\-\{\}]+/g;
+    const s = q.match(re);
+    console.log(s);
+    if(s !== null) {
+      if(this.state.keywordLen === null) {
+        this.setState({
+          keywordLen: s.length,
+        });
+      }
+      else if(this.state.keywordLen !== s.length && s.length > 1) {
+        this.setState({
+          keywordLen: s.length,
+        });
+      }
+    }
 
     this.setState({
         term: q,

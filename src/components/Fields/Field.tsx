@@ -45,48 +45,18 @@ export class Field extends React.Component<FieldProps> {
     }
   };
 
-  // handleVersioning(field: FieldModel) {
-  //   if(item.httpVerb === 'doc') {
-  //     return(undefined);
-  //   }
-  //   // if the operation is deprecated, then
-  //   if(item.deprecated) {
-  //     // if deprecatedIn is not undefined, then give the version it is deprecated
-  //     if(item.deprecatedIn !== 'DO_NOT_DISPLAY' && item.deprecatedIn !== undefined) {
-  //       return(
-  //         <Versioning>Deprecated in v{item.deprecatedIn}</Versioning>
-  //       );
-  //     }
-  //     // if deprecated=true but version is not specified
-  //     else {
-  //       return(undefined);
-  //     }
-  //   }
-  //   // else if introducedIn is not undefined
-  //   else if(field.introducedIn !== 'DO_NOT_DISPLAY') {
-  //     // the introducedIn prints Introduced in
-  //     return(
-  //       "\n(v"+field.introducedIn+")"
-  //     );
-  //   }
-  //   // otherwise
-  //   else {
-  //     return(undefined);
-  //   }
-  //   return(undefined);
-  // }
-
   render() {
     const { className, field, isLast, expandByDefault } = this.props;
-    // const { name, deprecated, required, kind } = field;
-    const { name, deprecated, required, kind, introducedIn } = field; // version-fields added
+    const { name, deprecated, required, kind, introducedIn, deprecatedIn } = field; // version-fields added
     const withSubSchema = !field.schema.isPrimitive && !field.schema.isCircular;
 
     const expanded = field.expanded === undefined ? expandByDefault : field.expanded;
 
     const paramName = withSubSchema ? (
       <ClickablePropertyNameCell
-        className={deprecated ? 'deprecated' : ''}
+        // className={deprecated ? 'deprecated' : ''}
+        className={deprecated && deprecatedIn !== undefined ? '(v'+deprecatedIn+')'
+        : deprecated ? 'deprecated' : ''}
         kind={kind}
         title={name}
       >
@@ -101,15 +71,18 @@ export class Field extends React.Component<FieldProps> {
         </button>
         {required && <RequiredLabel> required </RequiredLabel>}
         {/* version-field */}
-        <br />&nbsp;&nbsp;{"(v"+introducedIn+")"}
+        {introducedIn !== 'DO_NOT_DISPLAY' && introducedIn !== undefined ? <div><br />&nbsp;&nbsp;{"(v"+introducedIn+")"}</div> : undefined}
       </ClickablePropertyNameCell>
     ) : (
-      <PropertyNameCell className={deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
+      // <PropertyNameCell className={deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
+      <PropertyNameCell className={deprecated && deprecatedIn !== undefined ? '(v'+deprecatedIn+')' :
+        deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
+
         <PropertyBullet />
         <span>{name}</span>
         {required && <RequiredLabel> required </RequiredLabel>}
         {/* version-field */}
-        <br />&nbsp;&nbsp;{"(v"+introducedIn+")"}
+        {introducedIn !== 'DO_NOT_DISPLAY' && introducedIn !== undefined ? <div><br />&nbsp;&nbsp;{"(v"+introducedIn+")"}</div> : undefined}
       </PropertyNameCell>
     );
 

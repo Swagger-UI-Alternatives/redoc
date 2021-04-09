@@ -255,7 +255,7 @@ export async function dispose() {
 //const regex = /(TITLE|PATH|QUERY|OBJECT|PROPERTY)\[(.+?)\]/g;
 // ex: PATH[uuid], PATH[uuid] QUERY[sizing_method]
 
-const regex = /(GET|POST|PATCH|DELETE)|([a-z\/\.\-\{\}]+)|(PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
+const regex = /(GET|POST|PATCH|DELETE|DOC)|([a-z\/\.\-\{\}]+)|(PATH|QUERY|PROPERTY|OBJECT)\[(.+?)\]/g;
 
 export async function search<Meta = string>(
   q: string,
@@ -304,6 +304,7 @@ export async function search<Meta = string>(
           break;
         case 'doc':
           verbLookup.doc = false;
+          break;
       }
     }
     // function that is called if at least one verb has been inputted (verbFilter.length > 0)
@@ -364,20 +365,22 @@ export async function search<Meta = string>(
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
     // i.e. if there is no httpVerb before then this is performed
     // default search
-    if(fieldsArray.length === 0 && verbFilter.length === 0) {
+    console.log("let the filters begin");
+    if(verbFilter.length === 0 && fieldsArray.length === 0) {
       console.log("case 1");
-      if(q.length === 1) return;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
         .forEach(term => {
           if(term.length === 1) return;
           const exp = expandTerm(term);
-          if(term.substring(0) === '/') {
+          if(term.substring(0, 1) === '/') {
+            console.log("case 1.1");
             queryObject.term(exp, {
-              fields: ['title']
+              fields: ['title'] // searches tags and operations
             });
           }
           else {
+            console.log("case 1.2");
             queryObject.term(exp, {
               fields: ['description','longDescription']
             });
@@ -385,7 +388,7 @@ export async function search<Meta = string>(
       })
     }
     // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)
-    else if(fieldsArray.length === 0 && endpointFilter.length === 0 && verbFilter.length > 0) {
+    else if(verbFilter.length > 0 && endpointFilter.length === 0 && fieldsArray.length === 0) {
       console.log("case 2");
       // first get the verbs from the function that retrieves the verbs assigned prohibited (value = true)
         // if there's at least one httpVerb in the user input
