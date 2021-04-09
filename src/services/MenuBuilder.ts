@@ -41,7 +41,6 @@ export interface TagGroup {
 
 export const GROUP_DEPTH = 0;
 export let VERSION: string = '';  // Jarod-added J-version
-export let ACTIVE_T = new Map<string, boolean>();
 
 export type ContentItemModel = GroupModel | OperationModel;
 
@@ -152,13 +151,6 @@ export class MenuBuilder {
     } else {
       tagNames = group.tags;
     }
-
-    tagNames.forEach(key => {
-      console.log("menubuild " + key);
-      ACTIVE_T.set(key, false);
-      
-      console.log(ACTIVE_T.get(key));
-    })
 
     
 
