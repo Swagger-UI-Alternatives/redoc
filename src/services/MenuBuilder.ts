@@ -41,6 +41,8 @@ export interface TagGroup {
 
 export const GROUP_DEPTH = 0;
 export let VERSION: string = '';  // Jarod-added J-version
+export let ACTIVE_T = new Map<string, boolean>();
+
 export type ContentItemModel = GroupModel | OperationModel;
 
 export class MenuBuilder {
@@ -142,13 +144,23 @@ export class MenuBuilder {
     group: TagGroup | undefined,
     options: RedocNormalizedOptions,
   ): ContentItemModel[] {
-    let tagNames;
+    let tagNames: string[];
 
     if (group === undefined) {
       tagNames = Object.keys(tagsMap); // all tags
+      
     } else {
       tagNames = group.tags;
     }
+
+    tagNames.forEach(key => {
+      console.log("menubuild " + key);
+      ACTIVE_T.set(key, false);
+      
+      console.log(ACTIVE_T.get(key));
+    })
+
+    
 
     const tags = tagNames.map(tagName => {
       if (!tagsMap[tagName]) {
