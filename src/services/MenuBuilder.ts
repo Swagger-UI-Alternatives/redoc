@@ -143,13 +143,16 @@ export class MenuBuilder {
     group: TagGroup | undefined,
     options: RedocNormalizedOptions,
   ): ContentItemModel[] {
-    let tagNames;
+    let tagNames: string[];
 
     if (group === undefined) {
       tagNames = Object.keys(tagsMap); // all tags
+      
     } else {
       tagNames = group.tags;
     }
+
+    
 
     const tags = tagNames.map(tagName => {
       if (!tagsMap[tagName]) {
