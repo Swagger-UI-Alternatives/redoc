@@ -125,7 +125,11 @@ export class SchemaModel {
     this.writeOnly = !!schema.writeOnly;
     // version-fields
     this.introducedIn = schema['x-ntap-introduced'];
-    this.deprecatedIn = schema['x-ntap-introduced'];
+    this.deprecatedIn = schema['x-ntap-deprecated'];
+    
+    if(this.deprecatedIn !== undefined) {
+      this.deprecated = true;
+    }
 
     if (this.isCircular) {
       return;

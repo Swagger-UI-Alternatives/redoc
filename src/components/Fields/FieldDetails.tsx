@@ -48,7 +48,7 @@ export class FieldDetails extends React.PureComponent<FieldProps, { patternShown
     const { patternShown } = this.state;
     const { enumSkipQuotes, hideSchemaTitles, hideSchemaPattern } = this.context;
 
-    const { schema, description, example, deprecated, examples } = field;
+    const { schema, description, example, deprecated, deprecatedIn, examples } = field; {/* version-field */}
 
     const rawDefault = !!enumSkipQuotes || field.in === 'header'; // having quotes around header field default values is confusing and inappropriate
 
@@ -96,9 +96,9 @@ export class FieldDetails extends React.PureComponent<FieldProps, { patternShown
           )}
           {schema.isCircular && <RecursiveLabel> {l('recursive')} </RecursiveLabel>}
         </div>
-        {deprecated && (
+        {deprecated && deprecatedIn !== undefined && (
           <div>
-            <Badge type="warning"> {l('deprecated')} </Badge>
+            <Badge type="warning"> {'v'+deprecatedIn} </Badge>  {/* version-field */}
           </div>
         )}
         <FieldDetail raw={rawDefault} label={l('default') + ':'} value={schema.default} />

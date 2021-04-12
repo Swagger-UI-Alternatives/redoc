@@ -47,16 +47,14 @@ export class Field extends React.Component<FieldProps> {
 
   render() {
     const { className, field, isLast, expandByDefault } = this.props;
-    const { name, deprecated, required, kind, introducedIn, deprecatedIn } = field; // version-fields added
+    const { name, deprecated, required, kind, introducedIn } = field; // version-fields added
     const withSubSchema = !field.schema.isPrimitive && !field.schema.isCircular;
 
     const expanded = field.expanded === undefined ? expandByDefault : field.expanded;
 
     const paramName = withSubSchema ? (
       <ClickablePropertyNameCell
-        // className={deprecated ? 'deprecated' : ''}
-        className={deprecated && deprecatedIn !== undefined ? '(v'+deprecatedIn+')'
-        : deprecated ? 'deprecated' : ''}
+        className={deprecated ? 'deprecated' : ''}
         kind={kind}
         title={name}
       >
@@ -74,10 +72,7 @@ export class Field extends React.Component<FieldProps> {
         {introducedIn !== 'DO_NOT_DISPLAY' && introducedIn !== undefined ? <div><br />&nbsp;&nbsp;{"(v"+introducedIn+")"}</div> : undefined}
       </ClickablePropertyNameCell>
     ) : (
-      // <PropertyNameCell className={deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
-      <PropertyNameCell className={deprecated && deprecatedIn !== undefined ? '(v'+deprecatedIn+')' :
-        deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
-
+      <PropertyNameCell className={deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
         <PropertyBullet />
         <span>{name}</span>
         {required && <RequiredLabel> required </RequiredLabel>}
