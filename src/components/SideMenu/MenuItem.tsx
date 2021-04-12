@@ -6,9 +6,8 @@ import { ShelfIcon } from '../../common-elements/shelfs';
 import { IMenuItem, OperationModel } from '../../services';
 import { shortenHTTPVerb } from '../../utils/openapi';
 import { MenuItems } from './MenuItems';
-import { MenuItemLabel, MenuItemLi, MenuItemTitle, Versioning, OperationBadge } from './styled.elements'; // Jarod-added J-intro
-// import { MenuItemLabel, MenuItemLi, MenuItemTitle, OperationBadge } from './styled.elements';
-import { VERSION } from '../../services/MenuBuilder'; // Jarod-added J-version
+import { MenuItemLabel, MenuItemLi, MenuItemTitle, Versioning, OperationBadge } from './styled.elements';
+import { VERSION } from '../../services/MenuBuilder';
 
 import { l } from '../../services/Labels';
 
@@ -127,7 +126,7 @@ export class OperationMenuItemContent extends React.Component<OperationMenuItemC
       return(undefined);
     }
   }
-  // J-endDocTag J-badge this is how the OperationBadge gets sent from the local styled.elements.ts file to MenuItem to be rendered in the side menu
+  // this is how the OperationBadge gets sent from the local styled.elements.ts file to MenuItem to be rendered in the side menu
   render() {
     const { item } = this.props;
 
@@ -146,7 +145,6 @@ export class OperationMenuItemContent extends React.Component<OperationMenuItemC
         <MenuItemTitle width="calc(100% - 38px)">
           {item.name}
           {this.props.children}
-          {/* Jarod-added J-intro */}
           {this.handleVersioning(item)}
         </MenuItemTitle>
       </MenuItemLabel>

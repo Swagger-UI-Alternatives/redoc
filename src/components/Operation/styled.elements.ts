@@ -1,26 +1,5 @@
 import styled from '../../styled-components';
-// SideMenu's styled.elements.ts (the little httpVerb styling)
-/*
-  width: 9ex;
-  display: inline-block;
-  height: ${props => props.theme.typography.code.fontSize};
-  line-height: ${props => props.theme.typography.code.fontSize};
-  background-color: #333;
-  border-radius: 3px;
-  background-repeat: no-repeat;
-  background-position: 6px 4px;
-  font-size: 7px;
-  font-family: Verdana, sans-serif; // web-safe
-  color: white;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: bold;
-  vertical-align: middle;
-  margin-right: 6px;
-  margin-top: 2px;
-*/
 
-// J-endDocTag J-badge
 export const OperationBadge = styled.span.attrs((props: { type: string }) => ({
   className: `operation-type ${props.type}`,
 }))<{ type: string }>`
@@ -83,22 +62,3 @@ export const OperationBadge = styled.span.attrs((props: { type: string }) => ({
     background-color: ${props => props.theme.colors.primary.main};
   }
 `;
-/*
-// badge styling from shelfs.tsx
-export const Badge = styled.span<{ type: string }>`
-  display: inline-block;
-  padding: 2px 8px;
-  margin: 0;
-  background-color: ${props => props.theme.colors[props.type].main};
-  color: ${props => props.theme.colors[props.type].contrastText};
-  font-size: ${props => props.theme.typography.code.fontSize};
-  vertical-align: middle;
-  line-height: 1.6;
-  border-radius: 4px;
-  font-weight: ${({ theme }) => theme.typography.fontWeightBold};
-  font-size: 12px;
-  + span[type] {
-    margin-left: 4px;
-  }
-`;
-*/

@@ -15,7 +15,7 @@ export class GroupModel implements IMenuItem {
   absoluteIdx?: number;
   name: string;
   description?: string;
-  longDescription: string;                            // Jarod-added J-docTag
+  longDescription: string;  // x-ntap-long-description
   type: MenuItemGroupType;
 
   items: ContentItemModel[] = [];
@@ -46,12 +46,12 @@ export class GroupModel implements IMenuItem {
 
     // remove sections from markdown, same as in ApiInfo
     this.description = tagOrGroup.description || '';
-    this.longDescription = tagOrGroup['x-ntap-long-description'] || '';             // Jarod-added J-docTag
+    this.longDescription = tagOrGroup['x-ntap-long-description'] || '';
 
     const items = (tagOrGroup as MarkdownHeading).items;
     if (items && items.length) {
       this.description = MarkdownRenderer.getTextBeforeHading(this.description, items[0].name);
-      this.longDescription = MarkdownRenderer.getTextBeforeHading(this.longDescription, items[0].name); // Jarod-added J-docTag
+      this.longDescription = MarkdownRenderer.getTextBeforeHading(this.longDescription, items[0].name);
     }
 
     this.parent = parent;

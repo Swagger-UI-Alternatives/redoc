@@ -46,7 +46,7 @@ export type Referenced<T> = OpenAPIRef | T;
 export interface OpenAPIPath {
   summary?: string;
   description?: string;
-  doc?: 'x-ntap-long-description';  // Jarod-added J-endDocTag
+  doc?: 'x-ntap-long-description';  // endpoint-specific doc tags
   get?: OpenAPIOperation;
   put?: OpenAPIOperation;
   post?: OpenAPIOperation;
@@ -80,8 +80,8 @@ export interface OpenAPIOperation {
   servers?: OpenAPIServer[];
   'x-codeSamples'?: OpenAPIXCodeSample[];
   'x-code-samples'?: OpenAPIXCodeSample[]; // deprecated
-  introducedIn?: string;    // Jarod-added J-intro J-version
-  deprecatedIn?: string;  // Jarod-added J-dep J-version
+  introducedIn?: string;
+  deprecatedIn?: string;
 }
 
 export interface OpenAPIParameter {
@@ -99,8 +99,6 @@ export interface OpenAPIParameter {
   examples?: { [media: string]: Referenced<OpenAPIExample> };
   content?: { [media: string]: OpenAPIMediaType };
   encoding?: Record<string, OpenAPIEncoding>;
-  introducedIn?: string;  // version-fields
-  deprecatedIn?: string;  // version-fields
 }
 
 export interface OpenAPIExample {
@@ -260,7 +258,7 @@ export interface OpenAPISecurityScheme {
 export interface OpenAPITag {
   name: string;
   description?: string;
-  longDescription?: string;  // Jarod-added J-docTag
+  longDescription?: string; // x-ntap-long-description
   externalDocs?: OpenAPIExternalDocumentation;
   'x-displayName'?: string;
 }

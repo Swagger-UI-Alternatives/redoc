@@ -45,7 +45,7 @@ export class SchemaModel {
   default?: any;
   readOnly: boolean;
   writeOnly: boolean;
-  // version-field
+  // version-fields
   introducedIn?: string;
   deprecatedIn?: string;
 
@@ -123,13 +123,15 @@ export class SchemaModel {
     this.default = schema.default;
     this.readOnly = !!schema.readOnly;
     this.writeOnly = !!schema.writeOnly;
-    // version-fields
+
+    // version-fields start
     this.introducedIn = schema['x-ntap-introduced'];
     this.deprecatedIn = schema['x-ntap-deprecated'];
-    
+
     if(this.deprecatedIn !== undefined) {
       this.deprecated = true;
     }
+    // version-fields end
 
     if (this.isCircular) {
       return;

@@ -85,10 +85,7 @@ export class FieldModel {
     this.description =
       info.description === undefined ? this.schema.description || '' : info.description;
     this.example = info.example || this.schema.example;
-    // if(this.schema.introducedIn !== undefined) {
-    //   console.log("this.schema.introducedIn");
-    //   console.log(this.schema.title + " " + this.schema.introducedIn);
-    // }
+    
     if (info.examples !== undefined) {
       this.examples = mapValues(
         info.examples,
@@ -112,18 +109,15 @@ export class FieldModel {
 
     this.deprecated = info.deprecated === undefined ? !!this.schema.deprecated : info.deprecated;
 
-    this.deprecatedIn = info['x-ntap-deprecated'];  // version-fields
+    // version-fields start
+    this.deprecatedIn = info['x-ntap-deprecated'];
     this.deprecatedIn = info['x-ntap-deprecated'] === undefined ? this.schema.deprecatedIn : info['x-ntap-deprecated'];
 
     if(this.deprecatedIn !== undefined) {
       this.deprecated = true;
     }
-    // version-fields start
-    // if(info['x-ntap-introduced'] !== undefined) {
-    //   console.log("field");
-    //   console.log(info['x-ntap-introduced']);
-    // }
-    this.introducedIn = info['x-ntap-introduced'];  // version-fields
+
+    this.introducedIn = info['x-ntap-introduced'];
     this.introducedIn = info['x-ntap-introduced'] === undefined ? this.schema.introducedIn : info['x-ntap-introduced'];
     // version-fields end
 

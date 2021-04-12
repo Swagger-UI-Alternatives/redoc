@@ -18,8 +18,8 @@ export interface IMenuItem {
   name: string;
   description?: string;
   longDescription?: string;
-  introducedIn?: string;
-  deprecatedIn?: string;
+  introducedIn?: string;  // version-control
+  deprecatedIn?: string;  // version-control
   depth: number;
   active: boolean;
   expanded: boolean;

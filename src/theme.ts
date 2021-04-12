@@ -31,13 +31,13 @@ const defaultTheme: ThemeInterface = {
       dark: ({ colors }) => darken(colors.tonalOffset, colors.warning.main),
       contrastText: '#ffffff',
     },
-    introIn: {  // J-version
+    introIn: {  // version-control introduced in badge color
       main: '#669cff',
       light: ({ colors }) => lighten(colors.tonalOffset, colors.introIn.main),
       dark: ({ colors }) => darken(colors.tonalOffset, colors.introIn.main),
       contrastText: '#ffffff',
     },
-    newIn: {    // J-version
+    newIn: {    // version-control new in badge color
       main: '#005aff',
       light: ({ colors }) => lighten(colors.tonalOffset, colors.newIn.main),
       dark: ({ colors }) => darken(colors.tonalOffset, colors.newIn.main),
@@ -249,8 +249,8 @@ export interface ResolvedThemeInterface {
     primary: ColorSetting;
     success: ColorSetting;
     warning: ColorSetting;
-    introIn: ColorSetting;  // J-version
-    newIn: ColorSetting;    // J-version
+    introIn: ColorSetting;  // version-control add it
+    newIn: ColorSetting;    // version-control add it
     error: ColorSetting;
     gray: {
       50: string;

@@ -4,7 +4,6 @@ import { darken } from 'polished';
 import { deprecatedCss, ShelfIcon } from '../../common-elements';
 import styled, { css, ResolvedThemeInterface } from '../../styled-components';
 
-// J-endDocTag J-badge gonna use this
 export const OperationBadge = styled.span.attrs((props: { type: string }) => ({
   className: `operation-type ${props.type}`,
 }))<{ type: string }>`
@@ -166,11 +165,7 @@ export const MenuItemTitle = styled.span<{ width?: string }>`
   text-overflow: ellipsis;
 `;
 
-// Jarod-added J-intro
-// had to zero out the padding and margin to get IntroducedIn to behave like the endoint text.
-// also want the font-size to be 90% of the endpoint text and change opacity for a lighter grey.
-// text-decoration: none 
-// gets overridden
+// version-control added to side menu
 export const Versioning = styled.p`
   margin: 0;
   padding: 0;

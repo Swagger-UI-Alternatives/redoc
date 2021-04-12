@@ -19,9 +19,8 @@ import { ResponseSamples } from '../ResponseSamples/ResponseSamples';
 import { SecurityRequirements } from '../SecurityRequirement/SecurityRequirement';
 import { shortenHTTPVerb } from '../../utils/openapi';
 
-// Jarod-added J-badge
 import { OperationBadge } from './styled.elements';
-import { VERSION } from '../../services/MenuBuilder'; // Jarod-added J-version
+import { VERSION } from '../../services/MenuBuilder';
 
 const OperationRow = styled(Row)`
   backface-visibility: hidden;
@@ -41,19 +40,14 @@ export interface OperationProps {
 export class Operation extends React.Component<OperationProps> {
 
   handleVersioning(item: OperationModel) {
-    // hopefully we have the latest version at this point...
-    // if this is a doc operation then do nothing.
+    // if this is a doc operation then do nothing
     if(item.httpVerb === 'doc') {
       return(undefined);
     }
-
-    // Note: I want to assign deprecated=true if deprecatedIn is assigned in Operation. 
-    // Before rendering of the menuitems and the contentitems.
-
     // if the operation is deprecated, then
     if(item.deprecated) {
       // if deprecatedIn is not undefined, then give the version it is deprecated
-      if(item.deprecatedIn !== 'DO_NOT_DISPLAY' && item.deprecatedIn !== undefined) {
+      if(item.deprecatedIn !== undefined) {
         return(
           <Badge type="warning"> Deprecated in v{item.deprecatedIn} </Badge>
         );
@@ -89,8 +83,7 @@ export class Operation extends React.Component<OperationProps> {
   render() {
     const { operation } = this.props;
 
-    const { name: summary, description, externalDocs, isWebhook } = operation;  // J-version
-    // const { name: summary, description, deprecated, externalDocs, isWebhook } = operation;
+    const { name: summary, description, externalDocs, isWebhook } = operation;  // version-control
     const hasDescription = !!(description || externalDocs);
 
     return (
@@ -98,10 +91,9 @@ export class Operation extends React.Component<OperationProps> {
         {(options) => (
           <OperationRow>
             <MiddlePanel>
-              {/* J-badge i think i should add a color coded operationBadge here in H2 */}
               <H2>
                 <ShareLink to={operation.id} />
-                {/* J-badge add OperationBadge here. Also have to center these 3 things */}
+                {/* add OperationBadge here */}
                 <OperationBadge type={operation.httpVerb}>{shortenHTTPVerb(operation.httpVerb)}</OperationBadge>
                 {summary} {this.handleVersioning(operation)}
                 {isWebhook && <Badge type="primary"> Webhook </Badge>}
@@ -122,7 +114,7 @@ export class Operation extends React.Component<OperationProps> {
               <CallbacksList callbacks={operation.callbacks} />
             </MiddlePanel>
             <DarkRightPanel>
-              {/* Jarod-added J-endDocTag right panel doc removal */}
+              {/* right panel doc removal */}
               {!options.pathInMiddlePanel && !isWebhook && operation.httpVerb !== 'doc' && <Endpoint operation={operation} />}
               <RequestSamples operation={operation} />
               <ResponseSamples operation={operation} />

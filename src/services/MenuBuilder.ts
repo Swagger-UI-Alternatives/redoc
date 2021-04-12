@@ -40,7 +40,7 @@ export interface TagGroup {
 }
 
 export const GROUP_DEPTH = 0;
-export let VERSION: string = '';  // Jarod-added J-version
+export let VERSION: string = '';  // Global version variable
 
 export type ContentItemModel = GroupModel | OperationModel;
 
@@ -213,7 +213,7 @@ export class MenuBuilder {
     for (const operationInfo of tag.operations) {
       const operation = new OperationModel(parser, operationInfo, parent, options);
       operation.depth = depth;
-      // Jarod-added J-version
+      // version-control to get the largest introducedIn version number
       if(operation.introducedIn !== undefined) {
         if(VERSION === '') {
           VERSION = operation.introducedIn;
@@ -286,7 +286,7 @@ export class MenuBuilder {
 
   // static addModels()
 
-  static getVersion(): string {  // Jarod-added J-version to assign version to the version field in API Info
+  static getVersion(): string {  // version-control method to assign version to the version field in API Info
     return VERSION;
   }
 }

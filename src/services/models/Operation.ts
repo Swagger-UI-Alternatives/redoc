@@ -51,11 +51,9 @@ export class OperationModel implements IMenuItem {
   name: string;
   description?: string;
 
-  longDescription?: string; // Jarod-added J-endDocTag
-  introducedIn?: string;    // Jarod-added J-intro J-version
-  deprecatedIn?: string;    // Jarod-added J-dep J-version
-
-  // type: 'operation' | 'doc';
+  longDescription?: string; // added long description
+  introducedIn?: string;    // version-control
+  deprecatedIn?: string;    // version-control
 
   type = 'operation' as const;
 
@@ -105,24 +103,23 @@ export class OperationModel implements IMenuItem {
     this.isCallback = isCallback;
     this.isWebhook = !!operationSpec.isWebhook;
 
-    // Jarod-added J-endDocTag change the sidebar name to doc instead of overflown long description name
+    // change the sidebar name to doc instead of overflown long description name
     if(operationSpec.httpVerb === 'x-ntap-long-description') {
       this.httpVerb = 'doc';
     } else {
       this.httpVerb = operationSpec.httpVerb;
     }
-    // Jarod-added J-endDocTag getOperationSummary is coming from openapi.ts and is assigning the name to
-    // the summary, then the operationId, then the first 50 chars of the endpoint's description
+    // getOperationSummary is coming from openapi.ts and is assigning the name
     this.name = getOperationSummary(operationSpec);
 
-    this.name = this.path;  // Jarod-added J-endDocTag assign the name to be the path
+    this.name = this.path;  // reassign the operation name to be the path
 
     // assigns the values of the ONTAP versioning keys to Operation fields
-    this.introducedIn = operationSpec["x-ntap-introduced"]; // Jarod-added J-intro J-version
-    this.deprecatedIn = operationSpec["x-ntap-deprecated"]; // Jarod-added J-dep J-version
+    this.introducedIn = operationSpec["x-ntap-introduced"]; // version-control
+    this.deprecatedIn = operationSpec["x-ntap-deprecated"]; // version-control
     
     // assign deprecated to true if there is an ONTAP deprecation name specified
-    if(this.deprecatedIn !== undefined) { // Jarod-added J-dep J-version
+    if(this.deprecatedIn !== undefined) {
       this.deprecated = true;
     }
 
@@ -136,9 +133,10 @@ export class OperationModel implements IMenuItem {
       // TODO: update getting pathInfo for overriding servers on path level
       this.servers = normalizeServers('', operationSpec.servers || operationSpec.pathServers || []);
     } else {
+      // changed the unique key to include the tag name as well allow for the same operation in multiple tags
       this.id =
-      operationSpec.operationId !== undefined && parent !== undefined   // added these 2 lines
-        ? parent.id + '/operation/' + operationSpec.operationId         // this fixes duplicate operation key error in search
+      operationSpec.operationId !== undefined && parent !== undefined // fixes duplicate operation key error in search
+        ? parent.id + '/operation/' + operationSpec.operationId
         : operationSpec.operationId !== undefined
         ? 'operation/' + operationSpec.operationId
         : parent !== undefined

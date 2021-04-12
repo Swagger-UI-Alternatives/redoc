@@ -49,7 +49,7 @@ export function getStatusCodeType(statusCode: string | number, defaultAsError = 
 }
 
 const operationNames = {
-  'x-ntap-long-description': true,  // Jarod-added J-endDocTag
+  // 'x-ntap-long-description': true,
   get: true,
   post: true,
   put: true,
@@ -595,9 +595,9 @@ export function isRedocExtension(key: string): boolean {
     'x-additionalPropertiesName': true,
     'x-explicitMappingOnly': true,
     // ONTAP Redoc extensions
-    // 'x-ntap-long-description': true,  // Jarod-added J-docTag
-    // 'x-ntap-introduced': true,        // Jarod-added J-intro J-version
-    // 'x-ntap-deprecated': true,        // Jarod-added J-dep J-version
+    // 'x-ntap-long-description': true,
+    // 'x-ntap-introduced': true,
+    // 'x-ntap-deprecated': true,
   };
 
   return key in redocExtensions;
