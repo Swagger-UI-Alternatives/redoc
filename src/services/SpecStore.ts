@@ -25,6 +25,7 @@ export class SpecStore {
   ) {
     this.parser = new OpenAPIParser(spec, specUrl, options);
     this.info = new ApiInfoModel(this.parser);
+    console.log(this.info);
     this.externalDocs = this.parser.spec.externalDocs;
     this.contentItems = MenuBuilder.buildStructure(this.parser, this.options);
     // Jarod-added J-version let's get the version!

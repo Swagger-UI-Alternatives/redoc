@@ -53,7 +53,7 @@ export class MenuBuilder {
     options: RedocNormalizedOptions,
   ): ContentItemModel[] {
     const spec = parser.spec;
-
+    console.log(spec);
     const items: ContentItemModel[] = [];
     const tagsMap = MenuBuilder.getTagsWithOperations(spec);
     items.push(...MenuBuilder.addMarkdownItems(spec.info.description || '', undefined, 1, options));
@@ -64,6 +64,7 @@ export class MenuBuilder {
     } else {
       items.push(...MenuBuilder.getTagsItems(parser, tagsMap, undefined, undefined, options));
     }
+    // call addModels(spec)
     return items;
   }
 
@@ -282,6 +283,9 @@ export class MenuBuilder {
     }
     return tags;
   }
+
+  // static addModels()
+
   static getVersion(): string {  // Jarod-added J-version to assign version to the version field in API Info
     return VERSION;
   }

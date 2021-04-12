@@ -10,16 +10,16 @@ import { GROUP_DEPTH } from './MenuBuilder';
 
 export type MenuItemGroupType = 'group' | 'tag' | 'section';
 
-export type MenuItemType = MenuItemGroupType | 'operation';                   // | 'doc';
+export type MenuItemType = MenuItemGroupType | 'operation';
 /** Generic interface for MenuItems */
 export interface IMenuItem {
   id: string;
   absoluteIdx?: number;
   name: string;
   description?: string;
-  longDescription?: string;                                           // Jarod-added J-docTag
-  introducedIn?: string;                                              // Jarod-added J-intro J-version
-  deprecatedIn?: string;                                              // Jarod-added J-dep J-version
+  longDescription?: string;
+  introducedIn?: string;
+  deprecatedIn?: string;
   depth: number;
   active: boolean;
   expanded: boolean;

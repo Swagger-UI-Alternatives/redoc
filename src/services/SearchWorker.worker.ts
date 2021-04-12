@@ -373,6 +373,7 @@ export async function search<Meta = string>(
           if(term.length === 1) return;
           const exp = expandTerm(term);
           if(exp.substring(1, 2) === '/') {
+            // The user must only search for one endpoint, if any
             if(onlyOneEndpoint === false) {
               onlyOneEndpoint = true;
             } else {
@@ -479,35 +480,12 @@ export async function search<Meta = string>(
             console.log("return 2");
             return;
           }
-
-          // if(ep.substring(0, 1) === '/') {
-          //   if(onlyOneEndpoint === false) {
-          //     onlyOneEndpoint = true;
-          //   } else {
-          //     return;
-          //   }
-          //   console.log("case 1.1");
-          //   queryObject.term(exp, {
-          //     fields: ['title'] // searches tags and operations
-          //   });
-          // }
-
-
-          // else {
-          //   console.log("case 1.2");
-          //   queryObject.term(ep, {
-          //     fields: ['description','longDescription']
-          //   });
-          // }
-
-
-
         });
       }
     }
   });
 
-  if (limit > 0) {
+  if(limit > 0) {
     searchResults = searchResults.slice(0, limit);
   }
   console.log("searchResults");

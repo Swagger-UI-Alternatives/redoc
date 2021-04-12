@@ -123,18 +123,14 @@ export class SchemaModel {
     this.default = schema.default;
     this.readOnly = !!schema.readOnly;
     this.writeOnly = !!schema.writeOnly;
-    // version-field
-    // if(schema['x-ntap-introduced'] !== undefined) {
-    //   console.log("schema");
-    //   console.log(schema['x-ntap-introduced']);
-    // }
+    // version-fields
     this.introducedIn = schema['x-ntap-introduced'];
     this.deprecatedIn = schema['x-ntap-introduced'];
 
     if (this.isCircular) {
       return;
     }
-
+    
     if (!isChild && getDiscriminator(schema) !== undefined) {
       this.initDiscriminator(schema, parser);
       return;

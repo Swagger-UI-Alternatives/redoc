@@ -23,55 +23,32 @@ import {
   QuestionToolTip
 } from './styled.elements';
 
-// when writing React components with TypeScript, you have 2 options for typing its props:
-// use aliases or interfaces
-// an interface is for where you want to enforce *structural contracts* (i.e. what you want passed in or what you want returned back)
-// interface for DEFINING the SearchBox PROPS
 export interface SearchBoxProps {
-  // creates a generic SearchStore class, probably because there will be some operations that can only be done on a string
-  // and we need to make sure those operations are available in the generic class.
   search: SearchStore<string>;
   marker: MarkerService;
-  // make a function here with the parameter id which is a string
-  // and you return either a IMenuItem or undefined
   getItemById: (id: string) => IMenuItem | undefined;
-  // make a function that activates an item of type IMenuItem and returns void
   onActivate: (item: IMenuItem) => void;
-  // className variable is an optional parameter that is of type string
   className?: string;
 }
-// this interface DEFINES the STATE of the component
 export interface SearchBoxState {
-  // results is an array of SearchResult objects
   results: SearchResult[];
-  // the term string
   term: string;
-  // activeItemIdx is the index of the results
   activeItemIdx: number;
-  // added keywordLen to refresh search results if changed
-  keywordLen: number;
 }
-// SearchBox contains the props from SearchBoxProps and a SearchBoxState
-// React.PureComponent is similar to React.Component. The difference between them is that React.Component doesn’t implement shouldComponentUpdate(), but React.PureComponent implements it with a shallow prop and state comparison.
-// If your React component’s render() function renders the same result given the same props and state, you can use React.PureComponent for a performance boost in some cases.
-// TS - Generic classes have a generic type parameter list in angle brackets (<>) following the name of the class.
-// Must be generic class because SearchStore generic class takes in a generic type.
+
 export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxState> {
-  // initialize the current activeItemReference which is a MenuItem or null and we are initializing it to null
+  // initialize the current activeItemReference which is of type MenuItem or null and we are initializing it to null
   activeItemRef: MenuItem | null = null;
-  // I guess you need a constructor because you need to initialize the props and set the state
-  // since they are coming from outside the SearchBox class and have not yet been initialized.
+
   constructor(props) {
     super(props);
     this.state = {
       results: [],
       term: '',
       activeItemIdx: -1,
-      keywordLen: 0,  // added the keyword length to SearchBox constructor initialization
     };
   }
-  // clears the results  but not the activeItemIndex (or term?)
-  // and unmarks which is interesting!
+  // clears the results but not the activeItemIndex
   clearResults(term: string) {
     this.setState({
       results: [],
@@ -79,7 +56,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     });
     this.props.marker.unmark();
   }
-  // clear
+  // clear is called when user clicks x button
   clear = () => {
     this.setState({
       results: [],
@@ -88,11 +65,18 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     });
     this.props.marker.unmark();
   };
-  // this handles the keyboard functionality 
+  // this handles the keyboard functionality
   handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    // if ESC is pressed
     if(event.keyCode === 27) {
-      // ESC
       this.clear();
+    }
+    // if Backspace or DEL is pressed
+    if(event.keyCode === 8 || event.keyCode === 46) {
+      // if the last character is about to be deleted
+      if(this.state.term.length === 1) {
+        this.clear();
+      }
     }
     if(event.keyCode === 40) {
       // Arrow down
@@ -109,12 +93,25 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
       event.preventDefault();
     }
     if(event.keyCode === 13) {
-      // enter
+      // ENTER
       const activeResult = this.state.results[this.state.activeItemIdx];
-      if (activeResult) {
+      // if there is an activeResult navigate to it
+      if(activeResult) {
         const item = this.props.getItemById(activeResult.meta);
-        if (item) {
+        if(item) {
           this.props.onActivate(item);
+        }
+      }
+      // otherwise perform a search
+      else {
+        // if length < 3
+        if(this.state.term.length < 3) {
+          this.clearResults(this.state.term);
+        }
+        else {
+          this.setState(
+            () => this.searchCallback(this.state.term),
+          );
         }
       }
     }
@@ -152,7 +149,6 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   @debounce(400)
   searchCallback(searchTerm: string) {
     console.log("searchCallback - making a search");
-    // time to go into SearchStore
     this.props.search.search(searchTerm).then(res => {
       console.log("after callback: res");
       console.log(res);
@@ -161,38 +157,17 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   }
 
   search = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("search for");
-    const q = event.target.value;
-    // it takes at least 3 characters to actually search for something
-    if (q.length < 3) {
-      this.clearResults(q);
-      return;
-    }
+      const q = event.target.value;
 
-    // so we have the current length and the keywordLen
-    // first parse out the input and assign it to variable s
-    // then if s.length is different from the current keyword length, clear results and return
-    const re = /[\w\/\.\-\{\}]+/g;
-    const s = q.match(re);
-    console.log(s);
-    if(s !== null) {
-      if(this.state.keywordLen === null) {
+      if(this.state.activeItemIdx !== -1) {
         this.setState({
-          keywordLen: s.length,
+          activeItemIdx: -1,
         });
       }
-      else if(this.state.keywordLen !== s.length && s.length > 1) {
-        this.setState({
-          keywordLen: s.length,
-        });
-      }
-    }
 
-    this.setState({
+      this.setState({
         term: q,
-      },
-      () => this.searchCallback(this.state.term),
-    );
+      });
   };
 
   render() {
