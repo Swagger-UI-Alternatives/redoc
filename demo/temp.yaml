@@ -3119,6 +3119,7 @@ definitions:
         description : Aggregate hosting the volume. Required on POST.
         items:
           $ref: "#/definitions/aggregate_reference"  
+        x-ntap-deprecated: '9.9'
 
       constituents_per_aggregate:
         type: integer
@@ -3200,7 +3201,7 @@ definitions:
           split_initiated:
             type        : boolean
             description : This field is set when split is executed on any FlexClone, that is when the FlexClone volume is split from its parent FlexVol. This field needs to be set for splitting a FlexClone form FlexVol. Valid in PATCH.
-          parent_snapshot :
+          parent_snapshot:
             $ref: "#/definitions/snapshot_reference"
           parent_svm:
             $ref: "#/definitions/svm_reference"
@@ -4074,6 +4075,7 @@ definitions:
         readOnly: true
         example: "/api/resourcelink"
     x-ntap-introduced: '9.6'
+    x-ntap-deprecated: '9.9'
   
   self_link:
     type: object
@@ -4082,6 +4084,7 @@ definitions:
       self:
         $ref: "#/definitions/href"
     x-ntap-introduced: '9.6'
+    x-ntap-deprecated: '9.9'
   
   related_link:
     type: object
