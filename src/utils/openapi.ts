@@ -49,7 +49,7 @@ export function getStatusCodeType(statusCode: string | number, defaultAsError = 
 }
 
 const operationNames = {
-  // 'x-ntap-long-description': true,
+  'x-ntap-long-description': true,
   get: true,
   post: true,
   put: true,

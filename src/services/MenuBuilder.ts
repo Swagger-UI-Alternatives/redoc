@@ -64,7 +64,6 @@ export class MenuBuilder {
     } else {
       items.push(...MenuBuilder.getTagsItems(parser, tagsMap, undefined, undefined, options));
     }
-    // call addModels(spec)
     return items;
   }
 
@@ -235,8 +234,14 @@ export class MenuBuilder {
   static getTagsWithOperations(spec: OpenAPISpec): TagsInfoMap {
     const tags: TagsInfoMap = {};
     for (const tag of spec.tags || []) {
+      console.log("tag");
+      console.log(tag.name);
       tags[tag.name] = { ...tag, operations: [] };
     }
+    // add models here
+    const temp: OpenAPITag = MenuBuilder.addModels(spec);
+    tags[temp.name] = { ...temp, operations: [] };
+
 
     getTags(spec.paths);
     if (spec['x-webhooks']) {
@@ -284,7 +289,36 @@ export class MenuBuilder {
     return tags;
   }
 
-  // static addModels()
+  static addModels(spec: OpenAPISpec) {
+    let modelSchemas;
+    let modelsDescription: string = '';
+    let e: boolean = false;
+    if(spec.components !== undefined) {
+      modelSchemas = spec.components.schemas;
+      console.log(modelSchemas);
+
+      for(const key of Object.keys(modelSchemas)) {
+          console.log(key);
+          if(key === 'error') {
+            e = true;
+          }
+          else {
+            modelsDescription += '## ' + key + '\n<SchemaDefinition schemaRef="#/components/schemas/' + key + '" />\n\n';
+          }
+        }
+      }
+      // error is a sensitive word in the MarkdownRenderer so add at the end
+      if(e) {
+        modelsDescription += '## error\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
+      }
+
+    const modelTag: OpenAPITag = {
+      name: 'models',
+      'x-displayName': 'Models',
+      description: modelsDescription,
+    }
+    return modelTag;
+  }
 
   static getVersion(): string {  // version-control method to assign version to the version field in API Info
     return VERSION;

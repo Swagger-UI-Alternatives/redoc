@@ -122,15 +122,10 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
     this.setState({
       results,
     });
-    // ex of a term:
-    // PATCH PATH[uuid]
-    // this goes into the marker to be marked.
-    // so let's pull all searchTerms from the brackets to be highlighted with a regular expression
-    // const s = term.split(/\s+]/) // splits on spaces
+    // this goes into the marker to be highlighted
+    // so let's pull all searchTerms from the brackets we want to be highlighted with a regular expression
     const re = /[\w\/\.\-\{\}]+/g;
     const s = term.match(re);
-    // console.log(s);
-    // console.log(term);
     if(s !== null) {
       let a: string = "";
       s.forEach(i => {
