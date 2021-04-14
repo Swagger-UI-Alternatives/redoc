@@ -9,23 +9,37 @@ export class SingleContentItem extends React.Component<{
 }> {
   extractActive(menu: MenuStore): IMenuItem[] {
     const active = menu.flatItems[menu.activeItemIdx];
+    const sectionArray: IMenuItem[] = [menu.flatItems[0]];
+  
     console.log(active);
+    console.log(menu.activeItemIdx);
     
     if (!active) {
       console.log("NOT ACTIVE");
-      return [menu.flatItems[0]];
+      for(let i = 1; menu.flatItems[i].type === 'section'; i++ ){
+        sectionArray.push(menu.flatItems[i]);
+      }
+      return sectionArray;
     }
-    if (active.type !== 'operation') {
+    if (active.type !== 'operation' && active.type !== 'section') {
+ 
       console.log("NOT OP");
       return [{ ...active }];
     }
     console.log("OP");
     if(active.parent !== undefined){
-
+      
       return [{...(active.parent)}];
 
     }
-    return [];
+    else {
+      for(let i = 1; menu.flatItems[i].type === 'section'; i++ ){
+              sectionArray.push(menu.flatItems[i]);
+          }
+      return sectionArray;
+
+    }
+
   }
 
   render() {
