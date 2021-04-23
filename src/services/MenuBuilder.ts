@@ -64,6 +64,18 @@ export class MenuBuilder {
     } else {
       items.push(...MenuBuilder.getTagsItems(parser, tagsMap, undefined, undefined, options));
     }
+    items.forEach(e =>
+      {
+        if(e.name === "Models"){
+          e.items.forEach(element => {
+            if(element.name === "e!rror"){
+              element.name = "error";
+              element.id = "section/error";
+            }
+          });
+        }
+      });
+    console.log(items);
     return items;
   }
 
@@ -292,7 +304,8 @@ export class MenuBuilder {
   static addModels(spec: OpenAPISpec) {
     let modelSchemas;
     let modelsDescription: string = '';
-    let e: boolean = false;
+    //let e: boolean = false;
+    //let e: string = '';
     if(spec.components !== undefined) {
       modelSchemas = spec.components.schemas;
       console.log(modelSchemas);
@@ -300,17 +313,23 @@ export class MenuBuilder {
       for(const key of Object.keys(modelSchemas)) {
           console.log(key);
           if(key === 'error') {
-            e = true;
+            //e = "e!r!r!o!r!";
+            modelsDescription += '## e!rror\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
+
           }
           else {
             modelsDescription += '## ' + key + '\n<SchemaDefinition schemaRef="#/components/schemas/' + key + '" />\n\n';
           }
+          // if(e === ""){
+          //   console.log("error definition");
+          //   modelsDescription += '## error\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
+          // }
         }
       }
       // error is a sensitive word in the MarkdownRenderer so add at the end
-      if(e) {
-        modelsDescription += '## error\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
-      }
+      // if(e) {
+      //   modelsDescription += '## error\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
+      // }
 
     const modelTag: OpenAPITag = {
       name: 'models',
