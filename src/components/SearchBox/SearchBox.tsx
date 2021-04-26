@@ -118,7 +118,6 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   };
 
   setResults(results: SearchResult[], term: string) {
-    console.log("setResults");
     this.setState({
       results,
     });
@@ -143,10 +142,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   @bind
   @debounce(400)
   searchCallback(searchTerm: string) {
-    console.log("searchCallback - making a search");
     this.props.search.search(searchTerm).then(res => {
-      console.log("after callback: res");
-      console.log(res);
       this.setResults(res, searchTerm);
     });
   }
@@ -188,8 +184,8 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
         />
         {!this.state.term && <QuestionToolTip>
           <span className="tooltiptext">
-            The following keywords are supported: GET, POST, PATCH, DELETE
-            TITLE, PATH, QUERY, PROPERTY, OBJECT<br /><br />
+            The following keywords are supported: GET, POST, PATCH, DELETE, DOC
+            PATH[], QUERY[], PROPERTY[], OBJECT[]<br /><br />
             To search using a keyword, please use the following format: KEYWORD[search term]<br /><br />
             To search using multiple keywords, please include a space between them.
           </span>

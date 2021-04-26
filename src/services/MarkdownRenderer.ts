@@ -95,7 +95,7 @@ export class MarkdownRenderer {
     }
     return res;
   }
-
+  // lookie here
   attachHeadingsDescriptions(rawText: string) {
     const buildRegexp = (heading: MarkdownHeading) => {
       return new RegExp(`##?\\s+${heading.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}`);

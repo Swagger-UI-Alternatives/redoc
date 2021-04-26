@@ -119,6 +119,13 @@ export interface OpenAPISchema {
   required?: string[];
   readOnly?: boolean;
   writeOnly?: boolean;
+  // other x-ntap operation properties
+  ntapReadOnly?: boolean;
+  ntapWriteOnly?: boolean;
+  readCreate?: boolean;
+  readModify?: boolean;
+  createOnly?: boolean;
+  modifyOnly?: boolean;
   deprecated?: boolean;
   format?: string;
   externalDocs?: OpenAPIExternalDocumentation;

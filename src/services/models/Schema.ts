@@ -45,6 +45,13 @@ export class SchemaModel {
   default?: any;
   readOnly: boolean;
   writeOnly: boolean;
+  // other x-ntap operation properties
+  ntapReadOnly: boolean;
+  ntapWriteOnly: boolean;
+  readCreate: boolean;
+  readModify: boolean;
+  createOnly: boolean;
+  modifyOnly: boolean;
   // version-fields
   introducedIn?: string;
   deprecatedIn?: string;
@@ -123,7 +130,14 @@ export class SchemaModel {
     this.default = schema.default;
     this.readOnly = !!schema.readOnly;
     this.writeOnly = !!schema.writeOnly;
-
+    // other x-ntap operation properties
+    this.ntapReadOnly = !!schema['x-ntap-readOnly'];
+    this.ntapWriteOnly = !!schema['x-ntap-writeOnly'];
+    this.readCreate = !!schema['x-ntap-readCreate'];
+    this.readModify = !!schema['x-ntap-readModify'];
+    this.createOnly = !!schema['x-ntap-createOnly'];
+    this.modifyOnly = !!schema['x-ntap-modifyOnly'];
+    console.log("x-ntap-readOnly " + !!schema['x-ntap-readOnly']);
     // version-fields start
     this.introducedIn = schema['x-ntap-introduced'];
     this.deprecatedIn = schema['x-ntap-deprecated'];

@@ -2,7 +2,7 @@
 
 import styled, { extensionsHook, media } from '../styled-components';
 import { deprecatedCss } from './mixins';
-
+// how to fix overflow table business
 export const PropertiesTableCaption = styled.caption`
   text-align: right;
   font-size: 0.9em;
