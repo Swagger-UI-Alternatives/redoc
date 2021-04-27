@@ -137,7 +137,6 @@ export class SchemaModel {
     this.readModify = !!schema['x-ntap-readModify'];
     this.createOnly = !!schema['x-ntap-createOnly'];
     this.modifyOnly = !!schema['x-ntap-modifyOnly'];
-    console.log("x-ntap-readOnly " + !!schema['x-ntap-readOnly']);
     // version-fields start
     this.introducedIn = schema['x-ntap-introduced'];
     this.deprecatedIn = schema['x-ntap-deprecated'];
