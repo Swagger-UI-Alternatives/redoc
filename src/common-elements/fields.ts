@@ -27,6 +27,15 @@ export const ClickablePropertyNameCell = styled(PropertyNameCell)`
   }
 `;
 
+export const FieldTextBox = styled.input`
+  float: right;
+  vertical-align: middle;
+  font-size: ${({ theme }) => theme.typography.code.fontSize};
+  line-height: 20px;
+  width: 6.0em;
+  margin-right: 5px;
+`;
+
 export const FieldLabel = styled.span`
   vertical-align: middle;
   font-size: ${({ theme }) => theme.typography.code.fontSize};
@@ -54,6 +63,16 @@ export const RequiredLabel = styled(FieldLabel.withComponent('div'))`
   font-weight: normal;
   margin-left: 20px;
   line-height: 1;
+`;
+
+export const PlaceLabel = styled(FieldLabel.withComponent('div'))`
+  color: gray;
+  font-size: ${props => props.theme.schema.labelsTextSize};
+  font-weight: normal;
+  font-style: italic;
+  margin-left: 20px;
+  line-height: 1;
+  width: 16.0em;
 `;
 
 export const RecursiveLabel = styled(FieldLabel)`
