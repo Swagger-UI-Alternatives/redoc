@@ -155,7 +155,7 @@ export class OperationModel implements IMenuItem {
 
     if (options.showExtensions) {
       this.extensions = extractExtensions(operationSpec, options.showExtensions);
-      console.log("extensions "+this.extensions);
+      //console.log("extensions "+this.extensions);
     }
   }
 

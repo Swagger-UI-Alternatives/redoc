@@ -53,7 +53,7 @@ export class MenuBuilder {
     options: RedocNormalizedOptions,
   ): ContentItemModel[] {
     const spec = parser.spec;
-    console.log(spec);
+   // console.log(spec);
     const items: ContentItemModel[] = [];
     const tagsMap = MenuBuilder.getTagsWithOperations(spec);
     items.push(...MenuBuilder.addMarkdownItems(spec.info.description || '', undefined, 1, options));
@@ -75,7 +75,7 @@ export class MenuBuilder {
           });
         }
       });
-    console.log(items);
+    //console.log(items);
     return items;
   }
 
@@ -246,8 +246,8 @@ export class MenuBuilder {
   static getTagsWithOperations(spec: OpenAPISpec): TagsInfoMap {
     const tags: TagsInfoMap = {};
     for (const tag of spec.tags || []) {
-      console.log("tag");
-      console.log(tag.name);
+     // console.log("tag");
+      //console.log(tag.name);
       tags[tag.name] = { ...tag, operations: [] };
     }
     // add models here
@@ -308,10 +308,10 @@ export class MenuBuilder {
     //let e: string = '';
     if(spec.components !== undefined) {
       modelSchemas = spec.components.schemas;
-      console.log(modelSchemas);
+      //console.log(modelSchemas);
 
       for(const key of Object.keys(modelSchemas)) {
-          console.log(key);
+         // console.log(key);
           if(key === 'error') {
             //e = "e!r!r!o!r!";
             modelsDescription += '## e!rror\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';

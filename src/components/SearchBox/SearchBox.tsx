@@ -118,7 +118,7 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   };
 
   setResults(results: SearchResult[], term: string) {
-    console.log("setResults");
+    //console.log("setResults");
     this.setState({
       results,
     });
@@ -145,8 +145,8 @@ export class SearchBox extends React.PureComponent<SearchBoxProps, SearchBoxStat
   searchCallback(searchTerm: string) {
     console.log("searchCallback - making a search");
     this.props.search.search(searchTerm).then(res => {
-      console.log("after callback: res");
-      console.log(res);
+      //console.log("after callback: res");
+     // console.log(res);
       this.setResults(res, searchTerm);
     });
   }
