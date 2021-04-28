@@ -41,7 +41,6 @@ export class ScrollService {
   }
 
   isElementBellow(el: Element | null) {
-    console.log("isElementBelow");
     if (el === null) {
       return;
     }
@@ -49,7 +48,6 @@ export class ScrollService {
   }
 
   isElementAbove(el: Element | null) {
-    console.log("isElementAbove");
     if (el === null) {
       return;
     }

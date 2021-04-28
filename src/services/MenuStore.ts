@@ -66,6 +66,7 @@ export class MenuStore {
 
   items: IMenuItem[];
   flatItems: IMenuItem[];
+  isLastItem: boolean = false;
 
   /**
    * cached flattened menu items to support absolute indexing
@@ -111,6 +112,7 @@ export class MenuStore {
   updateOnScroll = (isScrolledDown: boolean): void => {
     const step = isScrolledDown ? 1 : -1;
     let itemIdx = this.activeItemIdx;
+    console.log("itemIdx: " + itemIdx);
     while (true) {
       if (itemIdx === -1 && !isScrolledDown) {
         break;
@@ -121,27 +123,41 @@ export class MenuStore {
       }
 
       if (isScrolledDown) {
+        console.log("isScrolledDown");
         const el = this.getElementAtOrFirstChild(itemIdx + 1);
         if (this.scroll.isElementBellow(el)) {
+          console.log("isElementBelow");
           break;
         }
       } else {
+        console.log("isScrolledUp");
         const el = this.getElementAt(itemIdx);
+        console.log("el");
+        console.log(el);
         if (this.scroll.isElementAbove(el)) {
+          console.log("isElementAbove");
+          // add here?
+          console.log("el above");
+          console.log(el);
           break;
         }
       }
 
       // if this is a section going into another section break
-      if (this.flatItems[itemIdx].type === 'section' && this.flatItems[itemIdx + 1].type !== 'section') {
-        break;
+      if (this.flatItems[itemIdx] !== undefined) {
+        if (this.flatItems[itemIdx].type === 'section' && this.flatItems[itemIdx + 1].type !== 'section') {
+          console.log("section one " + itemIdx);
+          break;
+        }
       }
 
       // if we are at the end of a tag
       if (this.flatItems[itemIdx].parent !== undefined) {
+        console.log("last item in tag");
         const parentItem: IMenuItem | undefined = this.flatItems[itemIdx].parent;
         const parentIndex = parentItem?.absoluteIdx;
         if (parentItem !== undefined && parentIndex !== undefined && (parentIndex + parentItem.items.length) < itemIdx + 1) {
+          console.log("break");
           break;
         }
       }
