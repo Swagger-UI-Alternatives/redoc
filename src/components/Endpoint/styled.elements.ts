@@ -1,7 +1,6 @@
 import styled from '../../styled-components';
 
 export const OperationEndpointWrap = styled.div`
-  cursor: pointer;
   position: relative;
   margin-bottom: 5px;
 `;
@@ -19,7 +18,6 @@ export const EndpointInfo = styled.button<{ expanded?: boolean; inverted?: boole
   color: inherit;
   width: 100%;
   text-align: left;
-  cursor: pointer;
   padding: 10px 30px 10px ${props => (props.inverted ? '10px' : '20px')};
   border-radius: ${props => (props.inverted ? '0' : '4px 4px 0 0')};
   background-color: ${props =>
@@ -53,9 +51,38 @@ export const HttpVerb = styled.span.attrs((props: { type: string; compact?: bool
   text-transform: uppercase;
   font-family: ${props => props.theme.typography.headings.fontFamily};
   margin: 0;
+  cursor: pointer;
+`;
+
+export const TryButton = styled.span<{ compact?: boolean }>`
+  font-size: ${props => (props.compact ? '0.8em' : '0.929em')};
+  line-height: ${props => (props.compact ? '18px' : '20px')};
+  background-color: #999999;
+  color: #ffffff;
+  padding: ${props => (props.compact ? '2px 8px' : '3px 10px')};
+  text-transform: uppercase;
+  font-family: ${props => props.theme.typography.headings.fontFamily};
+  margin: 0;
+  cursor: pointer;
+`;
+
+export const ExecuteTryButton = styled.button`
+  font-size: 0.9em;
+  line-height: 18px;
+  border: none;
+  background-color: ${props => props.theme.colors.primary.main};
+  color: #ffffff;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  font-family: ${props => props.theme.typography.headings.fontFamily};
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
 `;
 
 export const ServersOverlay = styled.div<{ expanded: boolean }>`
+  cursor: default;
   position: absolute;
   width: 100%;
   z-index: 100;
@@ -76,6 +103,7 @@ export const ServerItem = styled.div`
 `;
 
 export const ServerUrl = styled.div`
+  cursor: pointer;
   padding: 5px;
   border: 1px solid #ccc;
   background: #fff;
