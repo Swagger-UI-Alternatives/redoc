@@ -267,8 +267,6 @@ export async function search<Meta = string>(
     while((i = regex.exec(q)) !== null) {
       arrInput.push(i);
     }
-    console.log("while loop results");
-    console.log(arrInput);
 
     const verbFilter: string[] = [];
     const endpointFilter: string[] = [];
@@ -348,24 +346,11 @@ export async function search<Meta = string>(
         });
         searchItems.push(arr);
       }
-    }); 
-
-    console.log("verbFilter");
-    console.log(verbFilter);
-    console.log("endpointFilter")
-    console.log(endpointFilter)
-    console.log("fieldsArray");
-    console.log(fieldsArray);
-    console.log("searchItems");
-    console.log(searchItems);
-
-
+    });
     // if there are no filters, perform a default search on the titles, descriptions, and long descriptions
     // i.e. if there is no httpVerb before then this is performed
     // default search
-    console.log("let the filters begin");
     if(verbFilter.length === 0 && fieldsArray.length === 0) {
-      console.log("case 1");
       let onlyOneEndpoint: boolean = false;
       q.toLowerCase()
         .split(/\s+/) // splits on spaces
@@ -379,13 +364,11 @@ export async function search<Meta = string>(
             } else {
               return;
             }
-            console.log("case 1.1");
             queryObject.term(exp, {
               fields: ['title'] // searches tags and operations
             });
           }
           else {
-            console.log("case 1.2");
             queryObject.term(exp, {
               fields: ['description','longDescription']
             });
@@ -394,7 +377,6 @@ export async function search<Meta = string>(
     }
     // if there are no fields being searched (i.e. KEYWORD[searchTerm]) but there is at least one verb filter (GET, POST, PATCH, DELETE)
     else if(verbFilter.length > 0 && endpointFilter.length === 0 && fieldsArray.length === 0) {
-      console.log("case 2");
       // first get the verbs from the function that retrieves the verbs assigned prohibited (value = true)
         // if there's at least one httpVerb in the user input
         // and if we haven't seen 'get' in the user input, then add it to the verbs we want to filter out
@@ -416,7 +398,6 @@ export async function search<Meta = string>(
     /* NOW FOR THE PART WHEN WE BUILD OUR QUERY OBJECT WITH OTHER PIECES */
     // if there is at least one verbFilter
     else {
-      console.log("BUILD OBJECT");
       if(verbFilter.length > 0) {
         queryObject.term(prohibitedVerbs(), {
           fields: ['verb'],
@@ -434,11 +415,9 @@ export async function search<Meta = string>(
       // after the verbFilter/endpointFilter(s) happen (or not)
       // if there is at least one KEYWORD[searchTerm(s)]
       if(fieldsArray.length > 0 && searchItems.length > 0) {
-        console.log("case 3: at least one KEYWORD[searchTerm] with a searchTerm");
         let count: number = 0;
         // if there is only 1 fieldsArray we can specify that the presence is required
         if(fieldsArray.length === 1 && searchItems[count].length === 1) {
-          console.log("case 3.1: only one fieldsArray and searchItems[count] filter");
           queryObject.term(searchItems[count], {
             fields: [fieldsArray[count]],
             presence: lunr.Query.presence.REQUIRED
@@ -446,7 +425,6 @@ export async function search<Meta = string>(
         }
         // otherwise, there are multiple fieldsArrays (i.e. PATH[blah] QUERY[blah]) then this executes
         else {
-          console.log("case 3.2: multiple fieldArrays");
           // for each fields KEYWORD
           fieldsArray.forEach(field => {
             // add the searchItems and match against whatever fields
@@ -460,15 +438,12 @@ export async function search<Meta = string>(
       // if there is not at least one KEYWORD[searchTerm(s)]
       // i.e. endpointFilter > 1 i.e. KEYWORD[blah doesn't have an ending square bracket
       else {
-        console.log("else condition");
         let oneEndpoint: boolean = false;
         endpointFilter.forEach(ep => {
           if(ep.substring(1, 2) === '/') {
-            console.log("else cond 1");
             if(oneEndpoint === false) {
               oneEndpoint = true;
             } else {
-              console.log("return 1");
               return;
             }
             queryObject.term(ep, {
@@ -476,8 +451,7 @@ export async function search<Meta = string>(
               presence: lunr.Query.presence.REQUIRED
             });
           }
-          else { //if(oneEndpoint) {
-            console.log("return 2");
+          else {
             return;
           }
         });
@@ -488,10 +462,6 @@ export async function search<Meta = string>(
   if(limit > 0) {
     searchResults = searchResults.slice(0, limit);
   }
-  console.log("searchResults");
-  console.log(searchResults);
   const res = searchResults.map(res => ({ meta: store[res.ref], score: res.score }));
-  console.log("res");
-  console.log(res);
   return res;
 }

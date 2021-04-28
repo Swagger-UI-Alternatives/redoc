@@ -18,15 +18,15 @@ export class ScrollService {
 
   bind() {
     this._prevOffsetY = this.scrollY();
-    // if (this._scrollParent) {
-    //   this._scrollParent.addEventListener('scroll', this.handleScroll);
-    // }
+    if (this._scrollParent) {
+      this._scrollParent.addEventListener('scroll', this.handleScroll);
+    }
   }
 
   dispose() {
-    // if (this._scrollParent) {
-    //   this._scrollParent.removeEventListener('scroll', this.handleScroll);
-    // }
+    if (this._scrollParent) {
+      this._scrollParent.removeEventListener('scroll', this.handleScroll);
+    }
     this._emiter.removeAllListeners(EVENT);
   }
 
@@ -41,6 +41,7 @@ export class ScrollService {
   }
 
   isElementBellow(el: Element | null) {
+    console.log("isElementBelow");
     if (el === null) {
       return;
     }
@@ -48,6 +49,7 @@ export class ScrollService {
   }
 
   isElementAbove(el: Element | null) {
+    console.log("isElementAbove");
     if (el === null) {
       return;
     }

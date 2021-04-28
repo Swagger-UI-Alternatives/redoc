@@ -26,7 +26,6 @@ export class ResponseTitle extends React.PureComponent<ResponseTitleProps> {
       r += "<th> " + row[1].trim() + " </th> ";
     }
     if(row[2] !== undefined) {
-      console.log("row [2] " + row[2].trim());
       r += "<td> " + row[2].trim() + " </td> ";
     }
     return r;
@@ -55,8 +54,6 @@ export class ResponseTitle extends React.PureComponent<ResponseTitleProps> {
       splitTable = this.splitTable(title);
       newTitle = splitTable[0];
     }
-
-    // step 2: trigger the ntapErrorCodes when user clicks on 
 
     return (
       <button

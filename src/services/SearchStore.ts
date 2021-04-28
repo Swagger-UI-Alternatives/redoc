@@ -46,10 +46,6 @@ export class SearchStore<T> {
             this.add(group.name, group.description || '', group.longDescription || '', 
               params[0], params[1], objects, properties, group.httpVerb, group.name, group.id);
           }
-          // group.name = models
-          // objects and properties
-          // everything else ''
-          // the tag id
           else {
             this.add(group.name, group.description || '', group.longDescription || '', 
               [''], [''], [['']], [['']], '', '', group.id);

@@ -131,6 +131,21 @@ export class MenuStore {
           break;
         }
       }
+
+      // if this is a section going into another section break
+      if (this.flatItems[itemIdx].type === 'section' && this.flatItems[itemIdx + 1].type !== 'section') {
+        break;
+      }
+
+      // if we are at the end of a tag
+      if (this.flatItems[itemIdx].parent !== undefined) {
+        const parentItem: IMenuItem | undefined = this.flatItems[itemIdx].parent;
+        const parentIndex = parentItem?.absoluteIdx;
+        if (parentItem !== undefined && parentIndex !== undefined && (parentIndex + parentItem.items.length) < itemIdx + 1) {
+          break;
+        }
+      }
+
       itemIdx += step;
     }
 

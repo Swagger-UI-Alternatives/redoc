@@ -53,7 +53,6 @@ export class MenuBuilder {
     options: RedocNormalizedOptions,
   ): ContentItemModel[] {
     const spec = parser.spec;
-    console.log(spec);
     const items: ContentItemModel[] = [];
     const tagsMap = MenuBuilder.getTagsWithOperations(spec);
     items.push(...MenuBuilder.addMarkdownItems(spec.info.description || '', undefined, 1, options));
@@ -64,6 +63,16 @@ export class MenuBuilder {
     } else {
       items.push(...MenuBuilder.getTagsItems(parser, tagsMap, undefined, undefined, options));
     }
+    items.forEach(e => {
+        if(e.name === "Models") {
+          e.items.forEach(element => {
+            if(element.name === "e!rror") {
+              element.name = "error";
+              element.id = "section/error";
+            }
+          });
+        }
+      });
     return items;
   }
 
@@ -234,8 +243,8 @@ export class MenuBuilder {
   static getTagsWithOperations(spec: OpenAPISpec): TagsInfoMap {
     const tags: TagsInfoMap = {};
     for (const tag of spec.tags || []) {
-      console.log("tag");
-      console.log(tag.name);
+      // console.log("tag");
+      // console.log(tag.name);
       tags[tag.name] = { ...tag, operations: [] };
     }
     // add models here
@@ -291,27 +300,24 @@ export class MenuBuilder {
 
   static addModels(spec: OpenAPISpec) {
     let modelSchemas;
-    let modelsDescription: string = '';
-    let e: boolean = false;
+    let modelsDescription: string = "";
+    // check to ensure there are in fact components stored internally
     if(spec.components !== undefined) {
+      // and retrieve the model schemas of those components
       modelSchemas = spec.components.schemas;
-      console.log(modelSchemas);
 
+      // now we have every schema model imported from the yaml file
+      // then for each of the model schemas, append its name and internal reference to the end of the models description
       for(const key of Object.keys(modelSchemas)) {
-          console.log(key);
-          if(key === 'error') {
-            e = true;
-          }
-          else {
-            modelsDescription += '## ' + key + '\n<SchemaDefinition schemaRef="#/components/schemas/' + key + '" />\n\n';
-          }
+        if(key === 'error') {
+          modelsDescription += '## e!rror\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
+        }
+        else {
+          modelsDescription += '## ' + key + '\n<SchemaDefinition schemaRef="#/components/schemas/' + key + '" />\n\n';
         }
       }
-      // error is a sensitive word in the MarkdownRenderer so add at the end
-      if(e) {
-        modelsDescription += '## error\n<SchemaDefinition schemaRef="#/components/schemas/error" />\n\n';
-      }
-
+    }
+    // here we assign that long string of schema definitions and their referenced locations to the models tag description
     const modelTag: OpenAPITag = {
       name: 'models',
       'x-displayName': 'Models',
