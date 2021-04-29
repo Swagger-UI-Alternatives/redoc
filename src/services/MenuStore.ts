@@ -122,49 +122,80 @@ export class MenuStore {
         break;
       }
 
-      if (isScrolledDown) {
+      if (isScrolledDown && this.isLastItem === false) {
         console.log("isScrolledDown");
         const el = this.getElementAtOrFirstChild(itemIdx + 1);
         if (this.scroll.isElementBellow(el)) {
           console.log("isElementBelow");
           break;
         }
-      } else {
+      } else if (!isScrolledDown) {
         console.log("isScrolledUp");
         const el = this.getElementAt(itemIdx);
         console.log("el");
         console.log(el);
         if (this.scroll.isElementAbove(el)) {
           console.log("isElementAbove");
-          // add here?
           console.log("el above");
           console.log(el);
           break;
         }
-      }
-
-      // if this is a section going into another section break
-      if (this.flatItems[itemIdx] !== undefined) {
-        if (this.flatItems[itemIdx].type === 'section' && this.flatItems[itemIdx + 1].type !== 'section') {
-          console.log("section one " + itemIdx);
-          break;
+        // case when we should activate the second to last item
+        else {
+          if (this.isLastItem === true) {
+            itemIdx--;
+            this.isLastItem = false;
+            break;
+          }
         }
       }
+      /*
+      when scrolling up, we want to change items from the last item index
+      when this.scroll.isElementAbove(el) path is NOT TAKEN
+      */
+      // if this is a section going into another section break
+      // if (this.flatItems[itemIdx] !== undefined) {
+      //   if (this.flatItems[itemIdx].type === 'section' && this.flatItems[itemIdx + 1].type !== 'section') {
+      //     console.log("section one " + itemIdx);
+      //     break;
+      //   }
+      // }
+
+      // stops cloud tag from going to section area but causes other problems
+      // if (this.flatItems[itemIdx].parent === undefined) {
+      //   break;
+      // }
 
       // if we are at the end of a tag
       if (this.flatItems[itemIdx].parent !== undefined) {
         console.log("last item in tag");
         const parentItem: IMenuItem | undefined = this.flatItems[itemIdx].parent;
         const parentIndex = parentItem?.absoluteIdx;
-        if (parentItem !== undefined && parentIndex !== undefined && (parentIndex + parentItem.items.length) < itemIdx + 1) {
+        if (parentItem !== undefined && parentIndex !== undefined && (parentIndex + parentItem.items.length) <= itemIdx) {
           console.log("break");
+          this.isLastItem = true;
           break;
         }
+        // else {
+        //   console.log("not break");
+        //   this.isLastItem = false;
+        // }
       }
 
-      itemIdx += step;
+      // when to increment/decrement item index
+      if (this.isLastItem === false) {
+        itemIdx += step;
+      }
+      else if (this.isLastItem && step !== 1) {
+        console.log("else if (this.isLastItem && step !== 1)");
+        itemIdx += step;
+      }
+      // itemIdx += step;
     }
 
+    // if (this.isLastItem === false) {
+    //   this.activate(this.flatItems[itemIdx], true, true);
+    // }
     this.activate(this.flatItems[itemIdx], true, true);
   };
 
