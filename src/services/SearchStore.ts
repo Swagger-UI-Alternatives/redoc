@@ -30,9 +30,6 @@ export class SearchStore<T> {
   searchWorker = getWorker();
 
   indexItems(groups: Array<IMenuItem | OperationModel>) {
-    // print out some useful stuff
-    console.log("groups");
-    console.log(groups);
     const recurse = items => {
       items.forEach(group => {
         if(group.type !== 'group') {
