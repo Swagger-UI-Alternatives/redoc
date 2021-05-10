@@ -64,12 +64,12 @@ export class Field extends React.Component<FieldProps> {
           onKeyPress={this.handleKeyPress}
           aria-label="expand properties"
         >
+          {/* a way to fix the overflow */}
           {name.length <= 29 ? 
             <span>{name}</span>
           :
             <span>{name.substring(0, 29)} <br />&nbsp;&nbsp;{name.substring(29)}</span>
           }
-          {/* <span>{name}</span> */}
           <ShelfIcon direction={expanded ? 'down' : 'right'} />
         </button>
         {required && <RequiredLabel> required </RequiredLabel>}
@@ -79,12 +79,12 @@ export class Field extends React.Component<FieldProps> {
     ) : (
       <PropertyNameCell className={deprecated ? 'deprecated' : undefined} kind={kind} title={name}>
         <PropertyBullet />
+        {/* a way to fix the overflow */}
         {name.length <= 29 ? 
             <span>{name}</span>
           :
             <span>{name.substring(0, 29)} <br />&nbsp;&nbsp;{name.substring(29)}</span>
           }
-        {/* <span>{name}</span> */}
         {required && <RequiredLabel> required </RequiredLabel>}
         {/* version-field */}
         {introducedIn !== 'DO_NOT_DISPLAY' && introducedIn !== undefined ? <div><br />&nbsp;&nbsp;{"(v"+introducedIn+")"}</div> : undefined}
