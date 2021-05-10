@@ -243,8 +243,6 @@ export class MenuBuilder {
   static getTagsWithOperations(spec: OpenAPISpec): TagsInfoMap {
     const tags: TagsInfoMap = {};
     for (const tag of spec.tags || []) {
-      // console.log("tag");
-      // console.log(tag.name);
       tags[tag.name] = { ...tag, operations: [] };
     }
     // add models here
