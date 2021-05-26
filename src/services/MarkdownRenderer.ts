@@ -11,6 +11,8 @@ marked.setOptions({
   highlight: (str, lang) => {
     return highlight(str, lang);
   },
+  gfm: true,
+  breaks: true,
 });
 
 export const LEGACY_REGEXP = '^ {0,3}<!-- ReDoc-Inject:\\s+?<({component}).*?/?>\\s+?-->\\s*$';
@@ -97,6 +99,7 @@ export class MarkdownRenderer {
   }
   // lookie here
   attachHeadingsDescriptions(rawText: string) {
+    console.log("attachHeadingsDescriptions");
     const buildRegexp = (heading: MarkdownHeading) => {
       return new RegExp(`##?\\s+${heading.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}`);
     };
@@ -145,12 +148,15 @@ export class MarkdownRenderer {
     }
     return this.originalHeadingRule(text, level, raw, slugger);
   };
-
+  // Jarod: This is where it is
   renderMd(rawText: string, extractHeadings: boolean = false): string {
     const opts = extractHeadings ? { renderer: this.headingEnhanceRenderer } : undefined;
-
+    console.log("opts");
+    console.log(opts);
+    console.log(rawText);
     const res = marked(rawText.toString(), opts);
-
+    console.log("res");
+    console.log(res);
     return res;
   }
 
@@ -199,11 +205,15 @@ export class MarkdownRenderer {
 
     const res: any[] = [];
     for (let i = 0; i < htmlParts.length; i++) {
+      console.log("htmlParts[i]");
+      console.log(htmlParts[i]);
       const htmlPart = htmlParts[i];
       if (htmlPart) {
         res.push(this.renderMd(htmlPart));
       }
       if (componentDefs[i]) {
+        console.log("componentDefs[i]");
+        console.log(componentDefs[i]);
         res.push(componentDefs[i]);
       }
     }
