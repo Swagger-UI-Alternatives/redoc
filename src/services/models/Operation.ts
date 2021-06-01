@@ -133,15 +133,20 @@ export class OperationModel implements IMenuItem {
       // TODO: update getting pathInfo for overriding servers on path level
       this.servers = normalizeServers('', operationSpec.servers || operationSpec.pathServers || []);
     } else {
+      if (operationSpec.httpVerb === 'x-ntap-long-description' && parent !== undefined) {
+        this.id = "docs-"+parent.name+"-"+this.name.substring(1).split("/").join("_");
+      } else {
       // changed the unique key to include the tag name as well allow for the same operation in multiple tags
-      this.id =
-      operationSpec.operationId !== undefined && parent !== undefined // fixes duplicate operation key error in search
-        ? parent.id + '/operation/' + operationSpec.operationId
-        : operationSpec.operationId !== undefined
-        ? 'operation/' + operationSpec.operationId
-        : parent !== undefined
-        ? parent.id + this.pointer
-        : this.pointer;
+        this.id =
+        operationSpec.operationId !== undefined && parent !== undefined // fixes duplicate operation key error in search
+          ? parent.id + '/operation/' + operationSpec.operationId
+          : operationSpec.operationId !== undefined
+          ? 'operation/' + operationSpec.operationId
+          : parent !== undefined
+          ? parent.id + this.pointer
+          : this.pointer;
+      }
+
 
       this.security = (operationSpec.security || parser.spec.security || []).map(
         (security) => new SecurityRequirementModel(security, parser),
@@ -155,7 +160,6 @@ export class OperationModel implements IMenuItem {
 
     if (options.showExtensions) {
       this.extensions = extractExtensions(operationSpec, options.showExtensions);
-      //console.log("extensions "+this.extensions);
     }
   }
 

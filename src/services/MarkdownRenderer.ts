@@ -151,12 +151,15 @@ export class MarkdownRenderer {
   // Jarod: This is where it is
   renderMd(rawText: string, extractHeadings: boolean = false): string {
     const opts = extractHeadings ? { renderer: this.headingEnhanceRenderer } : undefined;
-    console.log("opts");
-    console.log(opts);
-    console.log(rawText);
+    if (rawText) {  // for printing only
+      console.log("rawText");
+      console.log(rawText);
+    }
     const res = marked(rawText.toString(), opts);
-    console.log("res");
-    console.log(res);
+    if (res) { // for printing only
+      console.log("res");
+      console.log(res);
+    }
     return res;
   }
 
@@ -205,15 +208,12 @@ export class MarkdownRenderer {
 
     const res: any[] = [];
     for (let i = 0; i < htmlParts.length; i++) {
-      console.log("htmlParts[i]");
-      console.log(htmlParts[i]);
       const htmlPart = htmlParts[i];
       if (htmlPart) {
         res.push(this.renderMd(htmlPart));
       }
+      
       if (componentDefs[i]) {
-        console.log("componentDefs[i]");
-        console.log(componentDefs[i]);
         res.push(componentDefs[i]);
       }
     }
