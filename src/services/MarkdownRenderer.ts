@@ -10,9 +10,7 @@ marked.setOptions({
   renderer,
   highlight: (str, lang) => {
     return highlight(str, lang);
-  },
-  gfm: true,
-  breaks: true,
+  }
 });
 
 export const LEGACY_REGEXP = '^ {0,3}<!-- ReDoc-Inject:\\s+?<({component}).*?/?>\\s+?-->\\s*$';
@@ -97,9 +95,8 @@ export class MarkdownRenderer {
     }
     return res;
   }
-  // lookie here
+
   attachHeadingsDescriptions(rawText: string) {
-    console.log("attachHeadingsDescriptions");
     const buildRegexp = (heading: MarkdownHeading) => {
       return new RegExp(`##?\\s+${heading.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}`);
     };
@@ -149,17 +146,18 @@ export class MarkdownRenderer {
     return this.originalHeadingRule(text, level, raw, slugger);
   };
   // Jarod: This is where it is
+  // https://github.com/xoofx/markdig/issues/510 
   renderMd(rawText: string, extractHeadings: boolean = false): string {
     const opts = extractHeadings ? { renderer: this.headingEnhanceRenderer } : undefined;
-    if (rawText) {  // for printing only
-      console.log("rawText");
-      console.log(rawText);
-    }
+    // if (rawText) {  // for printing only
+    //   console.log("rawText");
+    //   console.log(rawText);
+    // }
     const res = marked(rawText.toString(), opts);
-    if (res) { // for printing only
-      console.log("res");
-      console.log(res);
-    }
+    // if (res) { // for printing only
+    //   console.log("res");
+    //   console.log(res);
+    // }
     return res;
   }
 
@@ -212,7 +210,7 @@ export class MarkdownRenderer {
       if (htmlPart) {
         res.push(this.renderMd(htmlPart));
       }
-      
+
       if (componentDefs[i]) {
         res.push(componentDefs[i]);
       }
